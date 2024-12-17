@@ -1,0 +1,136 @@
+.interactive-guide-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.5);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1000;
+  animation: fadeIn 0.3s ease-out;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+.interactive-guide-container {
+  background-color: white;
+  border-radius: 10px;
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
+  width: 500px;
+  max-width: 90%;
+  padding: 20px;
+  position: relative;
+  animation: slideUp 0.4s ease-out;
+}
+
+@keyframes slideUp {
+  from {
+    transform: translateY(50px);
+    opacity: 0;
+  }
+  to {
+    transform: translateY(0);
+    opacity: 1;
+  }
+}
+
+.guide-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  border-bottom: 1px solid #e0e0e0;
+  padding-bottom: 15px;
+  margin-bottom: 15px;
+}
+
+.guide-header h2 {
+  margin: 0;
+  color: #333;
+  font-size: 1.5em;
+}
+
+.guide-close-btn {
+  background: none;
+  border: none;
+  font-size: 1.5em;
+  color: #666;
+  cursor: pointer;
+  transition: color 0.3s ease;
+}
+
+.guide-close-btn:hover {
+  color: #333;
+}
+
+.guide-content {
+  margin-bottom: 20px;
+}
+
+.guide-content p {
+  color: #555;
+  line-height: 1.6;
+  margin-bottom: 15px;
+}
+
+.guide-tip {
+  background-color: #f0f4f8;
+  border-left: 4px solid #4a90e2;
+  padding: 10px 15px;
+  border-radius: 4px;
+}
+
+.guide-tip span {
+  font-weight: bold;
+  color: #4a90e2;
+  margin-right: 10px;
+}
+
+.guide-navigation {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  border-top: 1px solid #e0e0e0;
+  padding-top: 15px;
+}
+
+.nav-btn {
+  padding: 10px 20px;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+}
+
+.prev-btn {
+  background-color: #e0e0e0;
+  color: #333;
+}
+
+.prev-btn:disabled {
+  background-color: #f0f0f0;
+  color: #999;
+  cursor: not-allowed;
+}
+
+.next-btn {
+  background-color: #4a90e2;
+  color: white;
+}
+
+.next-btn:hover {
+  background-color: #357abd;
+}
+
+.step-indicator {
+  color: #666;
+  font-weight: bold;
+}

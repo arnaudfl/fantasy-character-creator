@@ -1,0 +1,51 @@
+:root {
+  /* Primary Color Palette */
+  --color-primary: #2C3E50;        /* Deep Blue-Gray (Midnight Blue) */
+  --color-primary-light: #34495E;  /* Slightly Lighter Blue-Gray */
+  --color-primary-dark: #1A2633;   /* Darker Blue-Gray */
+  --color-primary-hover: #3A4F66;  /* Hover State Blue-Gray */
+
+  /* Accent Colors */
+  --color-accent: #3498DB;         /* Bright Blue */
+  --color-accent-light: #5DADE2;   /* Lighter Blue */
+  --color-accent-dark: #2980B9;    /* Darker Blue */
+
+  /* Neutral Colors */
+  --color-neutral-100: #F9FAFB;    /* Almost White */
+  --color-neutral-200: #F3F4F6;    /* Light Gray */
+  --color-neutral-300: #E5E7EB;    /* Light Gray */
+  --color-neutral-400: #D1D5DB;    /* Medium Gray */
+  --color-neutral-500: #9CA3AF;    /* Gray */
+  --color-neutral-600: #6B7280;    /* Dark Gray */
+  --color-neutral-700: #4B5563;    /* Darker Gray */
+  --color-neutral-800: #374151;    /* Very Dark Gray */
+  --color-neutral-900: #1F2937;    /* Almost Black */
+
+  /* Success, Warning, Error Colors */
+  --color-success: #48BB78;        /* Green */
+  --color-warning: #ECC94B;        /* Yellow */
+  --color-error: #E53E3E;          /* Red */
+
+  /* Spacing and Typography */
+  --spacing-xs: 0.25rem;
+  --spacing-sm: 0.5rem;
+  --spacing-md: 1rem;
+  --spacing-lg: 1.5rem;
+  --spacing-xl: 2rem;
+
+  /* Border Radius */
+  --border-radius-sm: 4px;
+  --border-radius-md: 6px;
+  --border-radius-lg: 8px;
+  --border-radius-xl: 12px;
+
+  /* Shadows */
+  --shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.1);
+  --shadow-md: 0 4px 6px rgba(0, 0, 0, 0.1);
+  --shadow-lg: 0 10px 15px rgba(0, 0, 0, 0.15);
+
+  /* Transitions */
+  --transition-fast: 0.2s;
+  --transition-medium: 0.3s;
+  --transition-slow: 0.5s;
+}

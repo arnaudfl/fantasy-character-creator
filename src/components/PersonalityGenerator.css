@@ -1,0 +1,86 @@
+.personality-generator {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  background-color: #f4f4f4;
+  padding: 1.5rem;
+  border-radius: 8px;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+.personality-section {
+  margin-bottom: 1rem;
+}
+
+.section-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 0.5rem;
+}
+
+.section-header h4 {
+  margin: 0;
+  color: #333;
+  font-weight: 600;
+}
+
+.randomize-section-btn,
+.randomize-traits-btn {
+  background-color: #28a745;
+  color: white;
+  border: none;
+  border-radius: 4px;
+  padding: 0.25rem 0.5rem;
+  font-size: 0.8rem;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+  margin-left: 0.5rem;
+}
+
+.randomize-section-btn:hover,
+.randomize-traits-btn:hover {
+  background-color: #218838;
+}
+
+.randomize-section-btn:active,
+.randomize-traits-btn:active {
+  background-color: #1e7e34;
+}
+
+.trait-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+  gap: 0.5rem;
+}
+
+.trait-item {
+  padding: 0.5rem;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  text-align: center;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.trait-item:hover {
+  background-color: #e0e0e0;
+}
+
+.trait-item.selected {
+  background-color: #4CAF50;
+  color: white;
+  border-color: #45a049;
+}
+
+.personality-section select {
+  width: 100%;
+  padding: 0.5rem;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  background-color: white;
+}
+
+.personality-section button:not(.randomize-section-btn):not(.randomize-traits-btn) {
+  display: none;
+}
