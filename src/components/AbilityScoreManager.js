@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useCallback, useRef } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import './AbilityScoreManager.css';
 
 // Racial Ability Score Modifiers

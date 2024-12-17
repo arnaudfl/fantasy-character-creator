@@ -1,7 +1,6 @@
 import React, { useState, useCallback, useEffect } from 'react';
 import CharacterStorageManager from '../utils/CharacterStorageManager';
 import CharacterPreview from './CharacterPreview';
-import AbilityTooltip from './AbilityTooltip';
 import EquipmentSelector from './EquipmentSelector';
 import PersonalityGenerator from './PersonalityGenerator';
 import AvatarGenerator from './AvatarGenerator';
