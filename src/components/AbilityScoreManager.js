@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect, useRef, useCallback } from 'react';
 import './AbilityScoreManager.css';
 
 // Racial Ability Score Modifiers
@@ -58,14 +58,14 @@ const initialBaseScores = {
   charisma: 10
 };
 
-const AbilityScoreManager = ({ 
+const AbilityScoreManager = React.memo(({ 
   race, 
   onAbilityScoreUpdate 
 }) => {
   const [baseScores, setBaseScores] = useState(initialBaseScores);
   const [pointsRemaining, setPointsRemaining] = useState(POINT_BUY_CONFIG.totalPoints);
-  const [isAdjusting, setIsAdjusting] = useState(false);
-  const previousRace = useRef(race);
+  const raceRef = useRef(race);
+  const updateRef = useRef(false);
 
   // Memoize race modifiers calculation
   const raceModifiers = React.useMemo(() => 
@@ -84,66 +84,56 @@ const AbilityScoreManager = ({
 
   // Reset scores when race changes
   useEffect(() => {
-    if (previousRace.current !== race) {
+    if (raceRef.current !== race) {
       setBaseScores(initialBaseScores);
       setPointsRemaining(POINT_BUY_CONFIG.totalPoints);
-      previousRace.current = race;
+      raceRef.current = race;
+      updateRef.current = true;
     }
   }, [race]);
 
-  // Notify parent of updates, but only when scores actually change
+  // Notify parent of updates only when necessary
   useEffect(() => {
-    const abilityScoreData = {
-      baseScores,
-      totalScores,
-      raceModifiers
-    };
-    onAbilityScoreUpdate(abilityScoreData, isAdjusting);
-  }, [baseScores, totalScores, raceModifiers, onAbilityScoreUpdate, isAdjusting]);
+    if (updateRef.current) {
+      const abilityScoreData = {
+        baseScores,
+        totalScores,
+        raceModifiers
+      };
+      onAbilityScoreUpdate(abilityScoreData);
+      updateRef.current = false;
+    }
+  }, [baseScores, totalScores, raceModifiers, onAbilityScoreUpdate]);
 
-  const calculatePointCost = (currentScore, newScore) => {
+  const calculatePointCost = useCallback((currentScore, newScore) => {
     const costTable = POINT_BUY_CONFIG.costTable;
-    let totalCost = 0;
+    const oldCost = costTable[currentScore] || 0;
+    const newCost = costTable[newScore] || 0;
+    return newCost - oldCost;
+  }, []);
 
-    if (newScore > currentScore) {
-      for (let score = currentScore; score < newScore; score++) {
-        totalCost += costTable[score + 1] - costTable[score];
-      }
-    } else {
-      for (let score = currentScore; score > newScore; score--) {
-        totalCost -= costTable[score] - costTable[score - 1];
-      }
-    }
-
-    return totalCost;
-  };
-
-  const updateAbilityScore = (ability, change) => {
-    setIsAdjusting(true);
-
-    const currentScore = baseScores[ability];
-    const newScore = currentScore + change;
-
-    // Check score bounds
+  const updateAbilityScore = useCallback((ability, newScore) => {
     if (newScore < POINT_BUY_CONFIG.minScore || newScore > POINT_BUY_CONFIG.maxScore) {
-      return;
+      return; // Prevent scores outside allowed range
     }
 
-    // Calculate point cost
-    const pointCost = calculatePointCost(currentScore, newScore);
+    setBaseScores(prevScores => {
+      const currentScore = prevScores[ability];
+      const pointCost = calculatePointCost(currentScore, newScore);
 
-    // Check if we have enough points
-    if (pointsRemaining - pointCost < 0) {
-      return;
-    }
+      // Check if we have enough points
+      if (pointsRemaining - pointCost >= 0) {
+        updateRef.current = true;
+        setPointsRemaining(prev => prev - pointCost);
+        return {
+          ...prevScores,
+          [ability]: newScore
+        };
+      }
 
-    // Update scores and remaining points
-    setBaseScores(prev => ({
-      ...prev,
-      [ability]: newScore
-    }));
-    setPointsRemaining(prev => prev - pointCost);
-  };
+      return prevScores; // No change if not enough points
+    });
+  }, [calculatePointCost, pointsRemaining]);
 
   return (
     <div className="ability-score-manager">
@@ -169,7 +159,7 @@ const AbilityScoreManager = ({
             <div className="score-controls">
               <button 
                 type="button"
-                onClick={() => updateAbilityScore(ability, -1)}
+                onClick={() => updateAbilityScore(ability, score - 1)}
                 disabled={score <= POINT_BUY_CONFIG.minScore}
               >
                 -
@@ -182,7 +172,7 @@ const AbilityScoreManager = ({
               </div>
               <button 
                 type="button"
-                onClick={() => updateAbilityScore(ability, 1)}
+                onClick={() => updateAbilityScore(ability, score + 1)}
                 disabled={score >= POINT_BUY_CONFIG.maxScore}
               >
                 +
@@ -193,6 +183,6 @@ const AbilityScoreManager = ({
       </div>
     </div>
   );
-};
+});
 
 export default AbilityScoreManager;

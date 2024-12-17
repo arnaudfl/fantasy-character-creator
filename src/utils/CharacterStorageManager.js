@@ -102,17 +102,43 @@ class CharacterStorageManager {
 
   // Generate a shareable URL for a character
   static generateShareableURL(character) {
-    // Encode the character data
-    const encodedCharacter = btoa(JSON.stringify(character));
-    return `${window.location.origin}?character=${encodedCharacter}`;
+    try {
+      // Remove sensitive or unnecessary data
+      const shareableData = {
+        name: character.name,
+        race: character.race,
+        class: character.class,
+        background: character.background,
+        strength: character.strength,
+        dexterity: character.dexterity,
+        constitution: character.constitution,
+        intelligence: character.intelligence,
+        wisdom: character.wisdom,
+        charisma: character.charisma,
+        baseAbilityScores: character.baseAbilityScores,
+        totalAbilityScores: character.totalAbilityScores,
+        raceAbilityModifiers: character.raceAbilityModifiers,
+        specialAbility: character.specialAbility,
+        equipment: character.equipment,
+        personality: character.personality,
+        avatar: character.avatar
+      };
+
+      const encodedData = btoa(JSON.stringify(shareableData));
+      return encodedData;
+    } catch (error) {
+      console.error('Error generating shareable URL:', error);
+      return null;
+    }
   }
 
-  // Decode a shareable URL
-  static decodeShareableURL(encodedCharacter) {
+  // Decode a shareable URL back into character data
+  static decodeShareableURL(encodedData) {
     try {
-      return JSON.parse(atob(encodedCharacter));
+      const decodedData = JSON.parse(atob(encodedData));
+      return decodedData;
     } catch (error) {
-      console.error('Error decoding shared character:', error);
+      console.error('Error decoding shareable URL:', error);
       return null;
     }
   }
