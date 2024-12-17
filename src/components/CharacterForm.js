@@ -1,4 +1,5 @@
-import React, { useState, useEffect, useCallback } from 'react';
+import React, { useState, useCallback, useEffect } from 'react';
+import CharacterStorageManager from '../utils/CharacterStorageManager';
 import CharacterPreview from './CharacterPreview';
 import AbilityTooltip from './AbilityTooltip';
 import EquipmentSelector from './EquipmentSelector';
@@ -6,7 +7,6 @@ import PersonalityGenerator from './PersonalityGenerator';
 import AvatarGenerator from './AvatarGenerator';
 import AbilityScoreManager from './AbilityScoreManager';
 import CharacterOptimizer from './CharacterOptimizer';
-import CharacterStorageManager from '../services/CharacterStorageManager';
 import DiceRollSimulator from './DiceRollSimulator';
 import InteractiveGuide from './InteractiveGuide';
 import './CharacterForm.css';
@@ -284,11 +284,64 @@ const CharacterForm = () => {
 
   const handleSubmit = (e) => {
     e.preventDefault();
+    
     if (validateForm(false)) {
-      console.log('Character Created:', character);
-      alert('Character created successfully!');
+      // Save the character
+      const savedCharacterId = CharacterStorageManager.saveCharacter(character);
+      
+      if (savedCharacterId) {
+        // Generate a shareable URL
+        const shareableURL = CharacterStorageManager.generateShareableURL(character);
+        setShareableURL(shareableURL);
+
+        // Update saved characters list
+        const updatedSavedCharacters = CharacterStorageManager.getAllCharacters();
+        setSavedCharacters(updatedSavedCharacters);
+
+        // Show success message
+        alert('Character created successfully!');
+        
+        // Optional: Reset form or navigate
+        // setCharacter(initialCharacterState);
+      } else {
+        alert('Failed to save character. Please check your data.');
+      }
     } else {
-      alert('Please fix the errors in the form');
+      alert('Please complete all required fields.');
+    }
+  };
+
+  const handleLoadCharacter = (characterId) => {
+    const loadedCharacter = CharacterStorageManager.getCharacterById(characterId);
+    if (loadedCharacter) {
+      setCharacter(loadedCharacter);
+    }
+  };
+
+  const handleDeleteCharacter = (characterId) => {
+    if (window.confirm('Are you sure you want to delete this character?')) {
+      CharacterStorageManager.deleteCharacter(characterId);
+      // Optionally, refresh the list of saved characters
+      setSavedCharacters(CharacterStorageManager.getAllCharacters());
+    }
+  };
+
+  const handleExportCharacters = () => {
+    CharacterStorageManager.exportCharacters();
+  };
+
+  const handleImportCharacters = (event) => {
+    const file = event.target.files[0];
+    if (file) {
+      CharacterStorageManager.importCharacters(file)
+        .then((importedCount) => {
+          alert(`Successfully imported ${importedCount} characters`);
+          // Refresh saved characters list
+          setSavedCharacters(CharacterStorageManager.getAllCharacters());
+        })
+        .catch((error) => {
+          alert('Failed to import characters');
+        });
     }
   };
 
@@ -337,6 +390,57 @@ const CharacterForm = () => {
       totalScores,
       raceModifiers: character.raceAbilityModifiers
     });
+  };
+
+  const renderSavedCharacters = () => {
+    return (
+      <div className="saved-characters-section">
+        <h3>Saved Characters</h3>
+        {savedCharacters.length === 0 ? (
+          <p>No saved characters yet.</p>
+        ) : (
+          <div className="saved-characters-list">
+            {savedCharacters.map((savedChar) => (
+              <div key={savedChar.id} className="saved-character-item">
+                <span>{savedChar.name} ({savedChar.race} {savedChar.class})</span>
+                <div className="saved-character-actions">
+                  <button 
+                    onClick={() => handleLoadCharacter(savedChar.id)}
+                    title="Load Character"
+                  >
+                    Load
+                  </button>
+                  <button 
+                    onClick={() => handleDeleteCharacter(savedChar.id)}
+                    title="Delete Character"
+                  >
+                    Delete
+                  </button>
+                </div>
+              </div>
+            ))}
+          </div>
+        )}
+        
+        <div className="character-export-import">
+          <button 
+            onClick={handleExportCharacters}
+            title="Export All Characters"
+          >
+            Export Characters
+          </button>
+          <label className="import-characters-label">
+            Import Characters
+            <input 
+              type="file" 
+              accept=".json"
+              onChange={handleImportCharacters}
+              style={{ display: 'none' }}
+            />
+          </label>
+        </div>
+      </div>
+    );
   };
 
   return (
@@ -509,6 +613,9 @@ const CharacterForm = () => {
       <div className="character-preview-container">
         <CharacterPreview character={character} />
       </div>
+
+      {/* Saved Characters Section */}
+      {renderSavedCharacters()}
     </div>
   );
 };

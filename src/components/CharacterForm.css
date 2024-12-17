@@ -243,30 +243,80 @@
 }
 
 .saved-characters-section {
-  margin-top: 20px;
-  background-color: #f4f4f4;
-  border-radius: 8px;
-  padding: 20px;
+  position: fixed;
+  top: 100px;
+  right: 20px;
+  background-color: var(--background-secondary);
+  border-radius: var(--border-radius-md);
+  padding: var(--spacing-md);
+  margin-top: var(--spacing-lg);
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
 }
 
-.saved-characters-grid {
+.saved-characters-section h3 {
+  margin-bottom: var(--spacing-md);
+  color: var(--text-color);
+}
+
+.saved-characters-list {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
-  gap: 15px;
+  grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+  gap: var(--spacing-sm);
 }
 
-.saved-character-card {
-  background-color: white;
-  border: 1px solid #e0e0e0;
-  border-radius: 8px;
-  padding: 15px;
-  text-align: center;
+.saved-character-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background-color: var(--background-tertiary);
+  padding: var(--spacing-sm);
+  border-radius: var(--border-radius-sm);
+  transition: background-color 0.3s ease;
+}
+
+.saved-character-item:hover {
+  background-color: var(--background-hover);
 }
 
 .saved-character-actions {
   display: flex;
+  gap: var(--spacing-sm);
+}
+
+.saved-character-actions button {
+  background-color: var(--color-primary);
+  color: white;
+  border: none;
+  padding: var(--spacing-xs) var(--spacing-sm);
+  border-radius: var(--border-radius-sm);
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+}
+
+.saved-character-actions button:hover {
+  background-color: var(--color-primary-dark);
+}
+
+.character-export-import {
+  display: flex;
   justify-content: space-between;
-  margin-top: 10px;
+  margin-top: var(--spacing-md);
+}
+
+.character-export-import button,
+.import-characters-label {
+  background-color: var(--color-secondary);
+  color: white;
+  border: none;
+  padding: var(--spacing-sm);
+  border-radius: var(--border-radius-sm);
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+}
+
+.character-export-import button:hover,
+.import-characters-label:hover {
+  background-color: var(--color-secondary-dark);
 }
 
 .guide-launcher {
