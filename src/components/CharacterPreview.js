@@ -153,6 +153,34 @@ const CharacterPreview = ({ character, onUpdateAvatar }) => {
           <p>{character.background}</p>
         </div>
       )}
+
+      {/* Background Story Preview */}
+      {character.backgroundStory && (
+        <div className="preview-background-story">
+          <h3>Background Story</h3>
+          <div className="background-story-details">
+            <div className="background-story-item">
+              <span className="background-story-label">Genre:</span>
+              <span className="background-story-value">{character.backgroundStory.genre}</span>
+            </div>
+            <div className="background-story-item">
+              <span className="background-story-label">Origin:</span>
+              <span className="background-story-value">{character.backgroundStory.origin}</span>
+            </div>
+            <div className="background-story-item">
+              <span className="background-story-label">Conflict:</span>
+              <span className="background-story-value">{character.backgroundStory.conflict}</span>
+            </div>
+            <div className="background-story-item">
+              <span className="background-story-label">Goal:</span>
+              <span className="background-story-value">{character.backgroundStory.goal}</span>
+            </div>
+            <div className="background-story-narrative">
+              <p>{character.backgroundStory.narrative}</p>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 };

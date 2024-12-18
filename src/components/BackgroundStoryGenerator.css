@@ -1,0 +1,43 @@
+.background-story-generator {
+  background-color: var(--color-surface);
+  border-radius: var(--border-radius-md);
+  padding: var(--spacing-md);
+  margin-top: var(--spacing-md);
+  box-shadow: var(--shadow-sm);
+}
+
+.background-story-generator h3 {
+  color: var(--color-primary);
+  margin-bottom: var(--spacing-sm);
+}
+
+.generate-story-btn {
+  background-color: var(--color-primary);
+  color: white;
+  border: none;
+  padding: var(--spacing-sm) var(--spacing-md);
+  border-radius: var(--border-radius-sm);
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+}
+
+.generate-story-btn:hover {
+  background-color: var(--color-primary-dark);
+}
+
+.background-story-details {
+  margin-top: var(--spacing-md);
+  background-color: var(--color-surface-light);
+  border-radius: var(--border-radius-sm);
+  padding: var(--spacing-sm);
+}
+
+.background-story-details p {
+  margin: var(--spacing-xs) 0;
+  line-height: 1.6;
+}
+
+.background-story-details p strong {
+  color: var(--color-text-dark);
+  margin-right: var(--spacing-sm);
+}
