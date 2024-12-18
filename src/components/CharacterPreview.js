@@ -63,7 +63,7 @@ const CharacterPreview = ({ character, onUpdateAvatar }) => {
           {abilityScores.map((ability) => (
             <div key={ability.name} className="ability-item">
               <span className="ability-name">{ability.name}</span>
-              <span className="ability-score">
+              <span className="character-preview-ability-score">
                 {ability.value}
                 <span className="ability-modifier">
                   ({calculateModifier(ability.value) >= 0 ? '+' : ''}{calculateModifier(ability.value)})

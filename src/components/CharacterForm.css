@@ -158,24 +158,24 @@
   border-radius: 4px;
 }
 
-.ability-scores {
+.character-form-ability-scores {
   display: grid;
   grid-template-columns: repeat(3, 1fr);
   gap: 10px;
   margin-bottom: 30px;
 }
 
-.ability-score {
+.character-form-ability-score {
   display: flex;
   flex-direction: column;
   position: relative;
 }
 
-.ability-score label {
+.character-form-ability-score label {
   margin-bottom: 5px;
 }
 
-.ability-score input {
+.character-form-ability-score input {
   width: 100%;
   text-align: center;
 }

@@ -89,14 +89,12 @@ class CharacterStorageManager {
 
   // Validate character before saving
   static validateCharacter(character) {
-    // Basic validation checks
+    // More lenient validation checks
     return !!(
       character.name &&
       character.race &&
       character.class &&
-      character.baseAbilityScores &&
-      character.equipment &&
-      character.personality
+      character.baseAbilityScores
     );
   }
 

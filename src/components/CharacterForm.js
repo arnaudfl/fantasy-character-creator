@@ -268,8 +268,24 @@ const CharacterForm = () => {
     setErrors(validationErrors);
     
     if (Object.keys(validationErrors).length === 0) {
+      // Ensure all required fields are present
+      const characterToSave = {
+        ...character,
+        name: character.name || 'Unnamed Character',
+        race: character.race || 'Unknown Race',
+        class: character.class || 'Unknown Class',
+        baseAbilityScores: character.baseAbilityScores || {
+          strength: 10,
+          dexterity: 10,
+          constitution: 10,
+          intelligence: 10,
+          wisdom: 10,
+          charisma: 10
+        }
+      };
+
       // Save character logic here
-      const savedId = CharacterStorageManager.saveCharacter(character);
+      const savedId = CharacterStorageManager.saveCharacter(characterToSave);
       if (savedId) {
         setCharacter(prevCharacter => ({
           ...prevCharacter,
@@ -278,7 +294,13 @@ const CharacterForm = () => {
         const updatedCharacters = CharacterStorageManager.getAllCharacters();
         setSavedCharacters(updatedCharacters);
         alert('Character saved successfully!');
+      } else {
+        console.error('Failed to save character', characterToSave);
+        alert('Failed to save character. Please check the console for details.');
       }
+    } else {
+      console.warn('Validation errors:', validationErrors);
+      alert('Please fill out all required fields before saving.');
     }
   };
 
