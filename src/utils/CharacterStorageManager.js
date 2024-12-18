@@ -5,22 +5,104 @@ class CharacterStorageManager {
   static saveCharacter(character) {
     // Validate character before saving
     if (!this.validateCharacter(character)) {
-      console.error('Invalid character cannot be saved');
+      console.error('Invalid character cannot be saved', character);
       return false;
     }
 
-    // Add timestamp and unique ID
+    // Comprehensive character saving with fallback and default values
     const characterToSave = {
-      ...character,
-      id: Date.now().toString(),
-      createdAt: new Date().toISOString()
+      // Basic information
+      id: character.id || Date.now().toString(),
+      name: character.name || 'Unnamed Character',
+      race: character.race || 'Unknown Race',
+      class: character.class || 'Unknown Class',
+      background: character.background || '',
+      
+      // Ability Scores with comprehensive fallback
+      strength: character.strength || 10,
+      dexterity: character.dexterity || 10,
+      constitution: character.constitution || 10,
+      intelligence: character.intelligence || 10,
+      wisdom: character.wisdom || 10,
+      charisma: character.charisma || 10,
+      
+      // Base Ability Scores
+      baseAbilityScores: {
+        strength: character.baseAbilityScores?.strength || character.strength || 10,
+        dexterity: character.baseAbilityScores?.dexterity || character.dexterity || 10,
+        constitution: character.baseAbilityScores?.constitution || character.constitution || 10,
+        intelligence: character.baseAbilityScores?.intelligence || character.intelligence || 10,
+        wisdom: character.baseAbilityScores?.wisdom || character.wisdom || 10,
+        charisma: character.baseAbilityScores?.charisma || character.charisma || 10
+      },
+      
+      // Total Ability Scores
+      totalAbilityScores: {
+        strength: character.totalAbilityScores?.strength || character.strength || 10,
+        dexterity: character.totalAbilityScores?.dexterity || character.dexterity || 10,
+        constitution: character.totalAbilityScores?.constitution || character.constitution || 10,
+        intelligence: character.totalAbilityScores?.intelligence || character.intelligence || 10,
+        wisdom: character.totalAbilityScores?.wisdom || character.wisdom || 10,
+        charisma: character.totalAbilityScores?.charisma || character.charisma || 10
+      },
+      
+      // Race Ability Modifiers
+      raceAbilityModifiers: character.raceAbilityModifiers || {
+        strength: 0,
+        dexterity: 0,
+        constitution: 0,
+        intelligence: 0,
+        wisdom: 0,
+        charisma: 0
+      },
+      
+      // Additional character details
+      specialAbility: character.specialAbility || '',
+      backgroundStory: character.backgroundStory || '',
+      
+      // Equipment
+      equipment: character.equipment || {
+        weapon: null,
+        armor: null,
+        shield: null,
+        accessories: []
+      },
+      
+      // Personality
+      personality: character.personality || {
+        traits: [],
+        motivation: '',
+        fear: '',
+        quirk: '',
+        background: ''
+      },
+      
+      // Avatar
+      avatar: character.avatar || null,
+      
+      // Optimization
+      optimization: character.optimization || null,
+      
+      // Timestamps
+      createdAt: character.createdAt || new Date().toISOString(),
+      updatedAt: new Date().toISOString()
     };
 
     // Retrieve existing characters
     const savedCharacters = this.getAllCharacters();
 
-    // Add new character
-    savedCharacters.push(characterToSave);
+    // Check if character already exists (update)
+    const existingCharacterIndex = savedCharacters.findIndex(
+      char => char.id === characterToSave.id
+    );
+
+    if (existingCharacterIndex !== -1) {
+      // Update existing character
+      savedCharacters[existingCharacterIndex] = characterToSave;
+    } else {
+      // Add new character
+      savedCharacters.push(characterToSave);
+    }
 
     // Save updated list
     try {
@@ -89,12 +171,19 @@ class CharacterStorageManager {
 
   // Validate character before saving
   static validateCharacter(character) {
-    // More lenient validation checks
+    // More comprehensive validation checks
     return !!(
       character.name &&
       character.race &&
       character.class &&
-      character.baseAbilityScores
+      character.baseAbilityScores &&
+      // Ensure ability scores have all required stats
+      character.baseAbilityScores.strength !== undefined &&
+      character.baseAbilityScores.dexterity !== undefined &&
+      character.baseAbilityScores.constitution !== undefined &&
+      character.baseAbilityScores.intelligence !== undefined &&
+      character.baseAbilityScores.wisdom !== undefined &&
+      character.baseAbilityScores.charisma !== undefined
     );
   }
 

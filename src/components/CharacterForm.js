@@ -5,7 +5,7 @@ import EquipmentSelector from './EquipmentSelector';
 import PersonalityGenerator from './PersonalityGenerator';
 import AvatarGenerator from './AvatarGenerator';
 import AbilityScoreManager from './AbilityScoreManager';
-import CharacterOptimizer from './CharacterOptimizer';
+import CharacterOptimizer from './CharacterOptimizer'; // Corrected import
 import DiceRollSimulator from './DiceRollSimulator';
 import InteractiveGuide from './InteractiveGuide';
 import BackgroundStoryGenerator from './BackgroundStoryGenerator';
@@ -154,6 +154,7 @@ const CharacterForm = () => {
   const [isValid, setIsValid] = useState(false);
   const [formTouched, setFormTouched] = useState(false);
   const [backgroundStory, setBackgroundStory] = useState(null);
+  const [loadedCharacterId, setLoadedCharacterId] = useState(null);
 
   const handleAbilityScoreUpdate = useCallback((abilityScoreData) => {
     setFormTouched(true);
@@ -206,6 +207,49 @@ const CharacterForm = () => {
     setSavedCharacters(characters);
   }, []);
 
+  useEffect(() => {
+    if (loadedCharacterId) {
+      const loadedCharacter = CharacterStorageManager.getCharacterById(loadedCharacterId);
+      if (loadedCharacter) {
+        console.log('Forcing character update:', loadedCharacter);
+        setCharacter(prevCharacter => ({
+          ...prevCharacter,
+          strength: loadedCharacter.strength,
+          dexterity: loadedCharacter.dexterity,
+          constitution: loadedCharacter.constitution,
+          intelligence: loadedCharacter.intelligence,
+          wisdom: loadedCharacter.wisdom,
+          charisma: loadedCharacter.charisma,
+          
+          baseAbilityScores: {
+            strength: loadedCharacter.baseAbilityScores.strength,
+            dexterity: loadedCharacter.baseAbilityScores.dexterity,
+            constitution: loadedCharacter.baseAbilityScores.constitution,
+            intelligence: loadedCharacter.baseAbilityScores.intelligence,
+            wisdom: loadedCharacter.baseAbilityScores.wisdom,
+            charisma: loadedCharacter.baseAbilityScores.charisma
+          },
+          totalAbilityScores: {
+            strength: loadedCharacter.totalAbilityScores.strength,
+            dexterity: loadedCharacter.totalAbilityScores.dexterity,
+            constitution: loadedCharacter.totalAbilityScores.constitution,
+            intelligence: loadedCharacter.totalAbilityScores.intelligence,
+            wisdom: loadedCharacter.totalAbilityScores.wisdom,
+            charisma: loadedCharacter.totalAbilityScores.charisma
+          },
+          raceAbilityModifiers: {
+            strength: loadedCharacter.raceAbilityModifiers.strength,
+            dexterity: loadedCharacter.raceAbilityModifiers.dexterity,
+            constitution: loadedCharacter.raceAbilityModifiers.constitution,
+            intelligence: loadedCharacter.raceAbilityModifiers.intelligence,
+            wisdom: loadedCharacter.raceAbilityModifiers.wisdom,
+            charisma: loadedCharacter.raceAbilityModifiers.charisma
+          }
+        }));
+      }
+    }
+  }, [loadedCharacterId]);
+
   const validateForm = useCallback((skipPersonality = false) => {
     const newErrors = {};
 
@@ -242,9 +286,10 @@ const CharacterForm = () => {
         newErrors.personality = 'Please generate or select a personality';
       }
 
-      if (!character.avatar || !character.avatar.svgString) {
-        newErrors.avatar = 'Please generate an avatar';
-      }
+      // Remove avatar validation
+      // if (!character.avatar || !character.avatar.svgString) {
+      //   newErrors.avatar = 'Please generate an avatar';
+      // }
 
       if (!character.baseAbilityScores) {
         newErrors.abilityScores = 'Please allocate ability scores';
@@ -274,13 +319,35 @@ const CharacterForm = () => {
         name: character.name || 'Unnamed Character',
         race: character.race || 'Unknown Race',
         class: character.class || 'Unknown Class',
-        baseAbilityScores: character.baseAbilityScores || {
-          strength: 10,
-          dexterity: 10,
-          constitution: 10,
-          intelligence: 10,
-          wisdom: 10,
-          charisma: 10
+        
+        // Explicitly set ability scores
+        baseAbilityScores: {
+          strength: character.baseAbilityScores?.strength || character.strength || 10,
+          dexterity: character.baseAbilityScores?.dexterity || character.dexterity || 10,
+          constitution: character.baseAbilityScores?.constitution || character.constitution || 10,
+          intelligence: character.baseAbilityScores?.intelligence || character.intelligence || 10,
+          wisdom: character.baseAbilityScores?.wisdom || character.wisdom || 10,
+          charisma: character.baseAbilityScores?.charisma || character.charisma || 10
+        },
+        
+        // Ensure total ability scores are set
+        totalAbilityScores: {
+          strength: character.totalAbilityScores?.strength || character.strength || 10,
+          dexterity: character.totalAbilityScores?.dexterity || character.dexterity || 10,
+          constitution: character.totalAbilityScores?.constitution || character.constitution || 10,
+          intelligence: character.totalAbilityScores?.intelligence || character.intelligence || 10,
+          wisdom: character.totalAbilityScores?.wisdom || character.wisdom || 10,
+          charisma: character.totalAbilityScores?.charisma || character.charisma || 10
+        },
+        
+        // Ensure race ability modifiers are set
+        raceAbilityModifiers: character.raceAbilityModifiers || {
+          strength: 0,
+          dexterity: 0,
+          constitution: 0,
+          intelligence: 0,
+          wisdom: 0,
+          charisma: 0
         }
       };
 
@@ -307,7 +374,55 @@ const CharacterForm = () => {
   const handleLoadCharacter = (characterId) => {
     const loadedCharacter = CharacterStorageManager.getCharacterById(characterId);
     if (loadedCharacter) {
-      setCharacter(loadedCharacter);
+      // Reset the loadedCharacterId to force re-render
+      setLoadedCharacterId(null);
+
+      // Use setTimeout to ensure state update
+      setTimeout(() => {
+        setLoadedCharacterId(characterId);
+        setCharacter(prevCharacter => {
+          console.log('Loading character:', loadedCharacter);
+          return {
+            ...loadedCharacter,
+            strength: loadedCharacter.strength,
+            dexterity: loadedCharacter.dexterity,
+            constitution: loadedCharacter.constitution,
+            intelligence: loadedCharacter.intelligence,
+            wisdom: loadedCharacter.wisdom,
+            charisma: loadedCharacter.charisma,
+            
+            baseAbilityScores: {
+              strength: loadedCharacter.baseAbilityScores.strength,
+              dexterity: loadedCharacter.baseAbilityScores.dexterity,
+              constitution: loadedCharacter.baseAbilityScores.constitution,
+              intelligence: loadedCharacter.baseAbilityScores.intelligence,
+              wisdom: loadedCharacter.baseAbilityScores.wisdom,
+              charisma: loadedCharacter.baseAbilityScores.charisma
+            },
+            totalAbilityScores: {
+              strength: loadedCharacter.totalAbilityScores.strength,
+              dexterity: loadedCharacter.totalAbilityScores.dexterity,
+              constitution: loadedCharacter.totalAbilityScores.constitution,
+              intelligence: loadedCharacter.totalAbilityScores.intelligence,
+              wisdom: loadedCharacter.totalAbilityScores.wisdom,
+              charisma: loadedCharacter.totalAbilityScores.charisma
+            },
+            raceAbilityModifiers: {
+              strength: loadedCharacter.raceAbilityModifiers.strength,
+              dexterity: loadedCharacter.raceAbilityModifiers.dexterity,
+              constitution: loadedCharacter.raceAbilityModifiers.constitution,
+              intelligence: loadedCharacter.raceAbilityModifiers.intelligence,
+              wisdom: loadedCharacter.raceAbilityModifiers.wisdom,
+              charisma: loadedCharacter.raceAbilityModifiers.charisma
+            }
+          };
+        });
+
+        // Explicitly set background story state
+        if (loadedCharacter.backgroundStory) {
+          setBackgroundStory(loadedCharacter.backgroundStory);
+        }
+      }, 0);
     }
   };
 
@@ -355,11 +470,13 @@ const CharacterForm = () => {
     }));
   };
 
-  const handleAvatarGenerate = (avatar) => {
+  const handleAvatarGenerated = (avatarUrl) => {
     setFormTouched(true);
     setCharacter(prevCharacter => ({
       ...prevCharacter,
-      avatar
+      avatar: {
+        svgString: avatarUrl
+      }
     }));
   };
 
@@ -651,8 +768,16 @@ const CharacterForm = () => {
           <div id="avatar-generator">
             {character.race && (
               <AvatarGenerator 
-                race={character.race.toLowerCase()} 
-                onAvatarGenerate={handleAvatarGenerate}
+                characterDetails={{
+                  name: character.name,
+                  race: character.race,
+                  class: character.class,
+                  background: character.background,
+                  alignment: character.alignment,
+                  level: 1,
+                  stats: character.stats
+                }}
+                onAvatarGenerated={handleAvatarGenerated}
               />
             )}
           </div>

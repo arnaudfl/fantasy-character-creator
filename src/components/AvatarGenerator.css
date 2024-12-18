@@ -1,9 +1,53 @@
-.avatar-generator {
-  background-color: #f9f9f9;
+.avatar-generator-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  margin: 1rem 0;
+  padding: 1rem;
   border: 1px solid #e0e0e0;
   border-radius: 8px;
-  padding: 20px;
-  margin-top: 20px;
+  background-color: #f9f9f9;
+  gap: 1rem;
+}
+
+.avatar-loading-spinner {
+  color: #666;
+  font-style: italic;
+  margin: 1rem 0;
+}
+
+.avatar-error-message {
+  color: #d32f2f;
+  margin: 1rem 0;
+  text-align: center;
+}
+
+.avatar-preview-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.avatar-preview-title {
+  font-size: 1rem;
+  color: #333;
+  font-weight: bold;
+}
+
+.avatar-preview-image {
+  max-width: 250px;
+  max-height: 350px;
+  width: 100%;
+  height: auto;
+  object-fit: cover;
+  border-radius: 8px;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  transition: transform 0.3s ease;
+}
+
+.avatar-preview-image:hover {
+  transform: scale(1.05);
 }
 
 .avatar-preview {
@@ -23,6 +67,47 @@
   display: flex;
   justify-content: center;
   margin-bottom: 20px;
+}
+
+.avatar-generation-controls {
+  display: flex;
+  gap: 1rem;
+  justify-content: center;
+  align-items: center;
+}
+
+.generate-avatar-btn {
+  background-color: #4CAF50;
+  color: white;
+  border: none;
+  padding: 10px 20px;
+  border-radius: 5px;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+  font-weight: bold;
+}
+
+.generate-avatar-btn:hover {
+  background-color: #45a049;
+}
+
+.generate-avatar-btn:disabled {
+  background-color: #cccccc;
+  cursor: not-allowed;
+}
+
+.clear-avatar-btn {
+  background-color: #f44336;
+  color: white;
+  border: none;
+  padding: 10px 20px;
+  border-radius: 5px;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+}
+
+.clear-avatar-btn:hover {
+  background-color: #d32f2f;
 }
 
 .randomize-btn {
@@ -103,4 +188,15 @@
 .shape-option svg {
   width: 100%;
   height: 100%;
+}
+
+.character-incomplete-warning {
+  background-color: #fff3e0;
+  color: #ff9800;
+  padding: 10px;
+  border-radius: 4px;
+  text-align: center;
+  width: 100%;
+  border: 1px solid #ffcc80;
+  font-size: 0.9rem;
 }

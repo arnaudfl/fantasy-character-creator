@@ -35,12 +35,42 @@ const CharacterPreview = ({ character, onUpdateAvatar }) => {
 
   // Ability scores
   const abilityScores = [
-    { name: 'Strength', value: character.strength || 10 },
-    { name: 'Dexterity', value: character.dexterity || 10 },
-    { name: 'Constitution', value: character.constitution || 10 },
-    { name: 'Intelligence', value: character.intelligence || 10 },
-    { name: 'Wisdom', value: character.wisdom || 10 },
-    { name: 'Charisma', value: character.charisma || 10 }
+    { 
+      name: 'Strength', 
+      value: character.totalAbilityScores?.strength || 
+             character.baseAbilityScores?.strength || 
+             character.strength || 10 
+    },
+    { 
+      name: 'Dexterity', 
+      value: character.totalAbilityScores?.dexterity || 
+             character.baseAbilityScores?.dexterity || 
+             character.dexterity || 10 
+    },
+    { 
+      name: 'Constitution', 
+      value: character.totalAbilityScores?.constitution || 
+             character.baseAbilityScores?.constitution || 
+             character.constitution || 10 
+    },
+    { 
+      name: 'Intelligence', 
+      value: character.totalAbilityScores?.intelligence || 
+             character.baseAbilityScores?.intelligence || 
+             character.intelligence || 10 
+    },
+    { 
+      name: 'Wisdom', 
+      value: character.totalAbilityScores?.wisdom || 
+             character.baseAbilityScores?.wisdom || 
+             character.wisdom || 10 
+    },
+    { 
+      name: 'Charisma', 
+      value: character.totalAbilityScores?.charisma || 
+             character.baseAbilityScores?.charisma || 
+             character.charisma || 10 
+    }
   ];
 
   return (
