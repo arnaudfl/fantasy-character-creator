@@ -8,6 +8,7 @@ import AbilityScoreManager from './AbilityScoreManager';
 import CharacterOptimizer from './CharacterOptimizer';
 import DiceRollSimulator from './DiceRollSimulator';
 import InteractiveGuide from './InteractiveGuide';
+import BackgroundStoryGenerator from './BackgroundStoryGenerator';
 import './CharacterForm.css';
 
 const characterOptions = {
@@ -138,7 +139,8 @@ const initialCharacterState = {
   equipment: null,
   personality: null,
   avatar: null,
-  optimization: null
+  optimization: null,
+  backgroundStory: null
 };
 
 const CharacterForm = () => {
@@ -151,6 +153,7 @@ const CharacterForm = () => {
   const [abilityScoreMethod, setAbilityScoreMethod] = useState('manual');
   const [isValid, setIsValid] = useState(false);
   const [formTouched, setFormTouched] = useState(false);
+  const [backgroundStory, setBackgroundStory] = useState(null);
 
   const handleAbilityScoreUpdate = useCallback((abilityScoreData) => {
     setFormTouched(true);
@@ -352,6 +355,15 @@ const CharacterForm = () => {
       ...prevCharacter,
       optimization
     }));
+  };
+
+  const handleBackgroundStoryGenerate = (generatedBackgroundStory) => {
+    setFormTouched(true);
+    setCharacter(prevCharacter => ({
+      ...prevCharacter,
+      backgroundStory: generatedBackgroundStory
+    }));
+    setBackgroundStory(generatedBackgroundStory);
   };
 
   const toggleAbilityScoreMethod = () => {
@@ -636,6 +648,17 @@ const CharacterForm = () => {
                     personality: newPersonality
                   }));
                 }}
+              />
+            )}
+          </div>
+
+          {/* Background Story Generator */}
+          <div id="background-story-generator">
+            {character.class && (
+              <BackgroundStoryGenerator
+                characterClass={character.class}
+                backgroundStory={backgroundStory}
+                onBackgroundStoryGenerate={handleBackgroundStoryGenerate}
               />
             )}
           </div>
