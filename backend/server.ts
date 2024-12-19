@@ -1,14 +1,21 @@
-const express = require('express');
-const cors = require('cors');
-const bodyParser = require('body-parser');
-const path = require('path');
-const fs = require('fs');
+import express from 'express';
+import cors from 'cors';
+import bodyParser from 'body-parser';
+import path from 'path';
+import fs from 'fs';
+import dotenv from 'dotenv';
+import avatarRoutes from './routes/avatarRoutes';
+
+// Load environment variables
+dotenv.config();
 
 const app = express();
+const PORT = process.env.PORT || 5000;
 
 // Middleware
 app.use(cors());
 app.use(bodyParser.json({ limit: '10mb' }));
+app.use(express.json());
 
 // Serve static files from public directory
 app.use('/character-avatars', express.static(path.join(__dirname, '../public/character-avatars')));
@@ -18,6 +25,9 @@ const avatarDir = path.join(__dirname, '../public/character-avatars');
 if (!fs.existsSync(avatarDir)) {
   fs.mkdirSync(avatarDir, { recursive: true });
 }
+
+// Routes
+app.use('/api/avatars', avatarRoutes);
 
 // Avatar Save Route
 app.post('/api/save-avatar', (req, res) => {
@@ -43,12 +53,14 @@ app.post('/api/save-avatar', (req, res) => {
     console.error('Avatar save error:', error);
     res.status(500).json({ 
       error: 'Failed to save avatar', 
-      details: error.message 
+      details: error instanceof Error ? error.message : 'Unknown error' 
     });
   }
 });
 
-const PORT = process.env.PORT || 5000;
+// Start server
 app.listen(PORT, () => {
-  console.log(`Backend server running on port ${PORT}`);
+  console.log(`Server running on port ${PORT}`);
 });
+
+export default app;

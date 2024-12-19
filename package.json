@@ -21,7 +21,7 @@
   },
   "scripts": {
     "start": "react-scripts start",
-    "start-backend": "node backend/server.js",
+    "start-backend": "ts-node backend/server.ts",
     "dev": "concurrently \"npm start\" \"npm run start-backend\"",
     "build": "react-scripts build && npm run build:backend",
     "build:backend": "tsc backend/server.ts --outDir build/backend",
@@ -50,8 +50,10 @@
     ]
   },
   "devDependencies": {
+    "@types/cors": "^2.8.17",
     "@types/fs-extra": "^11.0.4",
     "@types/react": "^19.0.2",
-    "@types/uuid": "^9.0.7"
+    "@types/uuid": "^9.0.7",
+    "ts-node": "^10.9.2"
   }
 }
