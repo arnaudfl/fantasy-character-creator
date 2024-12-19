@@ -19,6 +19,10 @@
 .env.test.local
 .env.production.local
 
+# Character Avatars
+public/character-avatars/
+build/public/character-avatars/
+
 npm-debug.log*
 yarn-debug.log*
 yarn-error.log*
