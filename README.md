@@ -43,6 +43,28 @@ Fantasy Character Creator is an interactive web application that allows users to
 - Responsive design
 - Guided character creation process
 
+## Avatar Generation Performance Optimization
+
+### Caching Mechanism
+- Intelligent local avatar caching system
+- Stores generated avatars with metadata
+- Automatic cache management
+  - Limit of 100 cached avatars
+  - 7-day expiry for cached images
+- Reduces redundant API calls
+- Fallback avatar generation
+
+### API Optimization
+- Retry mechanism for API calls
+- 30-second timeout for avatar generation
+- Detailed error handling
+- Fallback to default avatar on generation failure
+
+### Performance Features
+- Unique filename generation
+- Metadata-based avatar retrieval
+- Efficient storage and retrieval of generated avatars
+
 ## Technologies Used
 
 - React
@@ -80,6 +102,7 @@ Fantasy Character Creator is an interactive web application that allows users to
    ```bash
    REACT_APP_API_BASE_URL=http://localhost:5000
    HUGGING_FACE_API_KEY=your_hugging_face_api_key
+   HUGGING_FACE_API_TOKEN=your_hugging_face_api_token
    ```
 
 4. Install dependencies
