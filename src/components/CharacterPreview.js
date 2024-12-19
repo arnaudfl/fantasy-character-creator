@@ -35,25 +35,73 @@ const CharacterPreview = ({ character, onUpdateAvatar }) => {
 
   // Ability scores
   const abilityScores = [
-    { name: 'Strength', value: character.strength || 10 },
-    { name: 'Dexterity', value: character.dexterity || 10 },
-    { name: 'Constitution', value: character.constitution || 10 },
-    { name: 'Intelligence', value: character.intelligence || 10 },
-    { name: 'Wisdom', value: character.wisdom || 10 },
-    { name: 'Charisma', value: character.charisma || 10 }
+    { 
+      name: 'Strength', 
+      value: character.totalAbilityScores?.strength || 
+             character.baseAbilityScores?.strength || 
+             character.strength || 10 
+    },
+    { 
+      name: 'Dexterity', 
+      value: character.totalAbilityScores?.dexterity || 
+             character.baseAbilityScores?.dexterity || 
+             character.dexterity || 10 
+    },
+    { 
+      name: 'Constitution', 
+      value: character.totalAbilityScores?.constitution || 
+             character.baseAbilityScores?.constitution || 
+             character.constitution || 10 
+    },
+    { 
+      name: 'Intelligence', 
+      value: character.totalAbilityScores?.intelligence || 
+             character.baseAbilityScores?.intelligence || 
+             character.intelligence || 10 
+    },
+    { 
+      name: 'Wisdom', 
+      value: character.totalAbilityScores?.wisdom || 
+             character.baseAbilityScores?.wisdom || 
+             character.wisdom || 10 
+    },
+    { 
+      name: 'Charisma', 
+      value: character.totalAbilityScores?.charisma || 
+             character.baseAbilityScores?.charisma || 
+             character.charisma || 10 
+    }
   ];
+
+  const renderAvatar = () => {
+    if (!character.avatar) {
+      return <div className="no-avatar">No Avatar</div>;
+    }
+    
+    // Directly use the avatar path as the image source with a smaller size
+    return (
+      <div className="character-avatar-container">
+        <img 
+          src={character.avatar} 
+          alt={`${character.name}'s Avatar`} 
+          className="character-avatar-small" 
+        />
+      </div>
+    );
+  };
 
   return (
     <div className="character-preview">
       {/* Header */}
       <div className="preview-header">
-        <div className="preview-icon">{getCharacterIcon()}</div>
-        <div className="preview-title">
-          <h2>{character.name || 'Unnamed Character'}</h2>
-          <p className="preview-subheader">
-            {character.race} {character.class}
-          </p>
+        <h2>{character.name || 'Unnamed Character'}</h2>
+        <div className="preview-header-details">
+          <span>{character.race}</span>
+          <span>{character.class}</span>
         </div>
+        
+        {/* Avatar Preview */}
+        {renderAvatar()}
       </div>
 
       {/* Ability Scores */}
@@ -63,7 +111,7 @@ const CharacterPreview = ({ character, onUpdateAvatar }) => {
           {abilityScores.map((ability) => (
             <div key={ability.name} className="ability-item">
               <span className="ability-name">{ability.name}</span>
-              <span className="ability-score">
+              <span className="character-preview-ability-score">
                 {ability.value}
                 <span className="ability-modifier">
                   ({calculateModifier(ability.value) >= 0 ? '+' : ''}{calculateModifier(ability.value)})

@@ -1,83 +1,57 @@
 # Fantasy Character Creator
 
 ## Overview
-Fantasy Character Creator is an interactive web application that allows users to create detailed and unique characters for tabletop role-playing games, such as Dungeons & Dragons. The app provides a comprehensive character creation experience with features like ability score generation, equipment selection, personality trait generation, and avatar creation.
+Fantasy Character Creator is an innovative web application that allows users to generate unique fantasy character avatars with rich, detailed descriptions using AI-powered image generation.
 
 ## Features
+- 🎨 AI-Powered Avatar Generation
+- 🧙‍♀️ Comprehensive Character Creation
+- 🖼️ Dynamic Image Rendering
+- 🔄 Real-Time Progress Tracking
 
-### Character Creation Workflow
-- **Ability Score Generation**
-  - Manual point-buy system
-  - 4d6 drop lowest dice roll method
-  - Automatic racial ability score modifiers
+## Technologies
+- Frontend: React TypeScript
+- Backend: Express.js
+- AI Image Generation: Hugging Face Stable Diffusion
+- Caching: Redis
 
-- **Character Attributes**
-  - Name selection
-  - Race selection
-  - Class selection
-  - Ability scores (Strength, Dexterity, Constitution, Intelligence, Wisdom, Charisma)
+## Key Components
+- Detailed character prompt generation
+- Multiple AI model fallback
+- Comprehensive error handling
+- Simulated progress tracking
 
-- **Equipment Selection**
-  - Weapon selection
-  - Armor selection
-  - Shield and accessory options
-
-- **Personality Generation**
-  - Randomized trait generation
-  - Motivation selection
-  - Fear and quirk customization
-  - Background creation
-
-- **Avatar Generation**
-  - Custom SVG avatar creation
-  - Unique character visual representation
-
-### Additional Features
-- Dark/Light theme toggle
-- Character saving and sharing
-- Responsive design
-- Guided character creation process
-
-## Technologies Used
-- React
-- React Hooks
-- Context API
-- CSS Modules
-- SVG Generation
-- LocalStorage for character persistence
-
-## Getting Started
+## Environment Setup
 
 ### Prerequisites
-- Node.js (v14 or later)
-- npm (v6 or later)
+- Node.js
+- Redis
+- Hugging Face API Token
 
 ### Installation
 1. Clone the repository
-   ```bash
-   git clone https://github.com/yourusername/fantasy-character-creator.git
-   ```
+2. Install dependencies: `npm install`
+3. Set up `.env` file with required configurations
+4. Start the backend: `npm run backend`
+5. Start the frontend: `npm run frontend`
 
-2. Navigate to the project directory
-   ```bash
-   cd fantasy-character-creator
-   ```
+## Avatar Generation Process
+The avatar generation leverages advanced AI techniques:
+- Constructs detailed prompts including:
+  - Character class
+  - Race
+  - Background
+  - Personality traits
+  - Unique characteristics
+- Supports multiple Stable Diffusion models
+- Implements robust error handling
+- Provides real-time generation progress
 
-3. Install dependencies
-   ```bash
-   npm install
-   ```
-
-4. Start the development server
-   ```bash
-   npm start
-   ```
-
-5. Open [http://localhost:3000](http://localhost:3000) to view the app in your browser
-
-## Customization
-- Modify `src/data/` JSON files to add more races, classes, equipment, and personality traits
-- Adjust theme variables in `src/styles/globalVariables.css`
+## Contributing
+Contributions are welcome! Please read our contributing guidelines.
 
 ## License
-This project is open-source and available under the MIT License.
+[Your License Here]
+
+## Contact
+[Your Contact Information]

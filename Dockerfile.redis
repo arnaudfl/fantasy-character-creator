@@ -1,0 +1,10 @@
+FROM redis:latest
+
+# Optional: Custom Redis configuration
+COPY redis.conf /usr/local/etc/redis/redis.conf
+
+# Expose the default Redis port
+EXPOSE 6379
+
+# Use the custom configuration file when starting Redis
+CMD ["redis-server", "/usr/local/etc/redis/redis.conf"]
