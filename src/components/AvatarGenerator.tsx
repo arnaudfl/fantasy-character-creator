@@ -201,29 +201,13 @@ const AvatarGenerator: React.FC<AvatarGeneratorProps> = ({
       const prompt = generateDetailedPrompt();
       console.log('Generated Prompt:', prompt);
 
-      const imageResult = await generateAvatar(prompt);
+      const savedAvatarPath = await generateAvatar(prompt, characterDetails.name);
       
-      if (imageResult instanceof Blob) {
-        const savedAvatarPath = await saveAvatarLocally(imageResult);
-        
-        if (savedAvatarPath) {
-          setAvatar(savedAvatarPath);
-          // Convert image URL to SVG-like object to match form validation
-          const svgString = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 250 350">
-            <image href="${savedAvatarPath}" width="250" height="350"/>
-          </svg>`;
-          onAvatarGenerated?.({ svgString });
-        } else {
-          // Fallback to default avatar if generation fails
-          const defaultAvatar = generateDefaultAvatar();
-          setAvatar(defaultAvatar.url);
-          onAvatarGenerated?.({ svgString: defaultAvatar.svgString });
-        }
-      } else if (typeof imageResult === 'string') {
-        setAvatar(imageResult);
+      if (savedAvatarPath) {
+        setAvatar(savedAvatarPath);
         // Convert image URL to SVG-like object to match form validation
         const svgString = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 250 350">
-          <image href="${imageResult}" width="250" height="350"/>
+          <image href="${savedAvatarPath}" width="250" height="350"/>
         </svg>`;
         onAvatarGenerated?.({ svgString });
       } else {

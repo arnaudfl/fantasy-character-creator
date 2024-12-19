@@ -20,7 +20,24 @@ const FALLBACK_AVATARS: Record<FallbackAvatarKey, string> = {
   'default': '/avatars/default_character.svg'
 };
 
-export async function generateAvatar(prompt: string): Promise<Blob | string | null> {
+const API_BASE_URL = process.env.REACT_APP_API_BASE_URL || 'http://localhost:5000';
+
+// Save generated avatar to backend
+export const saveAvatar = async (avatarData: string, characterName: string) => {
+  try {
+    const response = await axios.post(`${API_BASE_URL}/api/save-avatar`, {
+      avatarData,
+      characterName
+    });
+    
+    return response.data.path;
+  } catch (error) {
+    console.error('Avatar save failed:', error);
+    throw error;
+  }
+};
+
+export async function generateAvatar(prompt: string, characterName: string): Promise<string | null> {
   console.log('Attempting to generate avatar with config:', HUGGINGFACE_CONFIG);
 
   // Check if API token is set
@@ -46,7 +63,19 @@ export async function generateAvatar(prompt: string): Promise<Blob | string | nu
     );
 
     console.log(' Avatar generation successful');
-    return response.data;
+    
+    // Convert blob to base64
+    const reader = new FileReader();
+    reader.readAsDataURL(response.data);
+    const base64 = await new Promise<string>((resolve) => {
+      reader.onloadend = () => {
+        resolve(reader.result as string);
+      };
+    });
+
+    // Save avatar and return the saved path
+    const savedAvatarPath = await saveAvatar(base64, characterName);
+    return savedAvatarPath;
   } catch (error: any) {
     console.error(' Avatar generation FAILED', error);
 
@@ -60,7 +89,7 @@ export async function generateAvatar(prompt: string): Promise<Blob | string | nu
     // Handle specific error scenarios
     if (error.response && error.response.status === 429) {
       console.warn(' Rate limit exceeded. Using fallback avatar.');
-      return FALLBACK_AVATARS.default;
+      return generateFallbackAvatar({ race: 'Human', class: 'Warrior' });
     }
 
     // For other errors, return null or fallback
