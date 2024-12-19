@@ -1,0 +1,14 @@
+services:
+  redis:
+    image: redis:latest
+    container_name: fantasy-character-creator-redis
+    ports:
+      - "6379:6379"
+    volumes:
+      - ./redis.conf:/usr/local/etc/redis/redis.conf
+      - redis-data:/data
+    command: redis-server /usr/local/etc/redis/redis.conf
+
+volumes:
+  redis-data:
+    driver: local

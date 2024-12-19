@@ -72,6 +72,7 @@ const AvatarGenerator: React.FC<AvatarGeneratorProps> = ({
   const [avatar, setAvatar] = useState<string | null>(characterDetails.avatarPath || null);
   const [error, setError] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(false);
+  const [progress, setProgress] = useState(0);
 
   // Comprehensive check for character details completeness
   const isFormComplete = useMemo(() => {
@@ -196,33 +197,77 @@ const AvatarGenerator: React.FC<AvatarGeneratorProps> = ({
 
     setIsLoading(true);
     setError(null);
+    
+    // Simulate initial progress
+    setProgress(10);
 
     try {
-      const prompt = generateDetailedPrompt();
-      console.log('Generated Prompt:', prompt);
+      console.log('Sending Avatar Generation Request:', {
+        characterClass: characterDetails.class,
+        race: characterDetails.race,
+        traits: characterDetails.traits,
+        background: characterDetails.background,
+        personality: characterDetails.alignment || 'Courageous adventurer'
+      });
 
-      const savedAvatarPath = await generateAvatar(prompt, characterDetails.name);
-      
-      if (savedAvatarPath) {
-        setAvatar(savedAvatarPath);
-        // Pass the avatar path and filename directly to onAvatarGenerated
-        onAvatarGenerated?.({ avatarPath: savedAvatarPath, filename: `${characterDetails.name.toLowerCase().replace(/\s+/g, '_')}_avatar.png` });
-      } else {
-        // Generate default avatar if no image is created
-        const defaultAvatar = generateDefaultAvatar();
-        setAvatar(defaultAvatar.url);
-        onAvatarGenerated?.({ avatarPath: defaultAvatar.url, filename: `${characterDetails.name.toLowerCase().replace(/\s+/g, '_')}_avatar.png` });
+      // Simulate progress increments
+      const progressInterval = setInterval(() => {
+        setProgress((prevProgress) => {
+          if (prevProgress < 70) {
+            return prevProgress + Math.floor(Math.random() * 10);
+          }
+          clearInterval(progressInterval);
+          return prevProgress;
+        });
+      }, 1000);
+
+      const response = await fetch(
+        `${process.env.REACT_APP_API_BASE_URL || 'http://localhost:5000'}/api/generate-avatar`, 
+        {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify({
+            characterClass: characterDetails.class,
+            race: characterDetails.race,
+            traits: characterDetails.traits,
+            background: characterDetails.background,
+            personality: characterDetails.alignment || 'Courageous adventurer'
+          })
+        }
+      );
+
+      // Clear the interval when the request completes
+      clearInterval(progressInterval);
+
+      console.log('Response Status:', response.status);
+      console.log('Response Headers:', Object.fromEntries(response.headers.entries()));
+
+      if (!response.ok) {
+        const errorText = await response.text();
+        console.error('Error response:', errorText);
+        throw new Error(`Avatar generation failed: ${errorText}`);
       }
-    } catch (err) {
-      // Generate default avatar on error
-      const defaultAvatar = generateDefaultAvatar();
-      setAvatar(defaultAvatar.url);
-      onAvatarGenerated?.({ avatarPath: defaultAvatar.url, filename: `${characterDetails.name.toLowerCase().replace(/\s+/g, '_')}_avatar.png` });
-      
-      setError('An unexpected error occurred.');
-      console.error(err);
-    } finally {
+
+      const data = await response.json();
+      console.log('Received Avatar Data:', data);
+
+      if (data.avatarUrl) {
+        setAvatar(data.avatarUrl);
+        setProgress(100);
+        onAvatarGenerated?.({ 
+          avatarPath: data.avatarUrl, 
+          filename: `${characterDetails.name.toLowerCase().replace(/\s+/g, '_')}_avatar.png` 
+        });
+      }
+
       setIsLoading(false);
+    } catch (error) {
+      console.error('Avatar generation failed:', error);
+      setIsLoading(false);
+      setProgress(0);
+      setError(error instanceof Error ? error.message : 'Unknown error');
     }
   };
 
@@ -264,6 +309,16 @@ const AvatarGenerator: React.FC<AvatarGeneratorProps> = ({
       {error && (
         <div className="avatar-error-message">
           {error}
+        </div>
+      )}
+      
+      {isLoading && (
+        <div className="progress-container">
+          <div 
+            className="progress-bar" 
+            style={{ width: `${progress}%` }}
+          ></div>
+          <span className="progress-text">{progress}%</span>
         </div>
       )}
       

@@ -1,45 +1,47 @@
 import express from 'express';
+import { EventEmitter } from 'events';
 import axios from 'axios';
+import Redis from 'ioredis';
+import { v4 as uuidv4 } from 'uuid';
 import dotenv from 'dotenv';
 
 dotenv.config();
 
 const router = express.Router();
-
-interface AvatarGenerationRequest {
-  characterClass: string;
-  race: string;
-  traits?: string[];
-}
-
-router.post('/generate-avatar', async (req, res) => {
-  try {
-    const { characterClass, race, traits } = req.body as AvatarGenerationRequest;
-
-    // Construct detailed prompt
-    const prompt = constructPrompt({ characterClass, race, traits });
-
-    // Call Hugging Face API
-    const avatarResponse = await callHuggingFaceAPI(prompt);
-
-    res.json({ 
-      avatarUrl: avatarResponse,
-      prompt: prompt // Optional: return the prompt for debugging
-    });
-  } catch (error) {
-    console.error('Avatar generation error:', error);
-    res.status(500).json({ 
-      error: 'Failed to generate avatar', 
-      details: error instanceof Error ? error.message : 'Unknown error' 
-    });
-  }
+const avatarGenerationEmitter = new EventEmitter();
+const redis = new Redis({
+  host: process.env.REDIS_HOST || 'localhost',
+  port: process.env.REDIS_PORT ? parseInt(process.env.REDIS_PORT) : 6379
 });
 
-// Reuse the prompt construction logic from frontend
-function constructPrompt(options: AvatarGenerationRequest): string {
-  const { characterClass, race, traits } = options;
+// Utility function to generate cache key
+function generateCacheKey(options: { characterClass: string, race: string, traits?: string[], background?: string, personality?: string }): string {
+  const keyParts = [
+    options.characterClass, 
+    options.race, 
+    ...(options.traits || []).sort(),
+    options.background || '',
+    options.personality || ''
+  ];
+  return `avatar:${keyParts.join(':')}`;
+}
+
+// Prompt construction function
+function constructPrompt(options: { 
+  characterClass: string, 
+  race: string, 
+  traits?: string[], 
+  background?: string, 
+  personality?: string 
+}): string {
+  const { 
+    characterClass, 
+    race, 
+    traits = [], 
+    background = 'Adventurer seeking glory', 
+    personality = 'Courageous and determined' 
+  } = options;
   
-  // Equipment mapping based on character class
   const equipmentMap: { [key: string]: string[] } = {
     'Warrior': ['full plate armor', 'longsword', 'kite shield', 'battle-worn gauntlets'],
     'Mage': ['elegant robes', 'staff of arcane power', 'spell component pouch', 'intricate magical amulet'],
@@ -51,72 +53,211 @@ function constructPrompt(options: AvatarGenerationRequest): string {
     'Wizard': ['scholarly robes', 'spellbook', 'crystal focus', 'intricate magical rings']
   };
 
-  // Personality trait descriptors
-  const personalityTraits: { [key: string]: string[] } = {
-    'Warrior': ['stoic', 'battle-hardened', 'honorable', 'determined'],
-    'Mage': ['mysterious', 'intellectual', 'analytical', 'arcane-focused'],
-    'Rogue': ['cunning', 'street-smart', 'shadowy', 'quick-witted'],
-    'Cleric': ['compassionate', 'devout', 'healing', 'righteous'],
-    'Ranger': ['nature-connected', 'observant', 'wilderness-skilled', 'solitary'],
-    'Paladin': ['noble', 'righteous', 'protective', 'zealous'],
-    'Barbarian': ['fierce', 'primal', 'passionate', 'untamed'],
-    'Wizard': ['scholarly', 'enigmatic', 'knowledge-seeking', 'contemplative']
-  };
-
-  // Backstory elements
-  const backstoryElements: { [key: string]: string[] } = {
-    'Warrior': ['raised in a military academy', 'seeking redemption', 'defending homeland', 'legendary battle survivor'],
-    'Mage': ['arcane university graduate', 'searching for ancient knowledge', 'mysterious magical lineage', 'elemental prodigy'],
-    'Rogue': ['street orphan', 'master of disguise', 'revenge-driven', 'guild-trained infiltrator'],
-    'Cleric': ['divine mission', 'temple-raised', 'healing the wounded', 'fighting unholy forces'],
-    'Ranger': ['forest guardian', 'last of a woodland clan', 'tracking ancient evil', 'nature\'s protector'],
-    'Paladin': ['sworn to a holy order', 'righteous crusader', 'divine champion', 'fighting corruption'],
-    'Barbarian': ['tribal warrior', 'wilderness survivor', 'seeking clan\'s honor', 'primal force of nature'],
-    'Wizard': ['forbidden magic researcher', 'dimensional traveler', 'magical experiment survivor', 'arcane secrets seeker']
-  };
-
-  // Randomly select equipment, traits, and backstory
   const selectedEquipment = equipmentMap[characterClass] || [];
-  const selectedTraits = personalityTraits[characterClass] || [];
-  const selectedBackstory = backstoryElements[characterClass] || [];
-
-  // Construct detailed prompt
-  const basePrompt = `Fantasy RPG character, ${race} ${characterClass}, `;
   const equipmentDesc = selectedEquipment.slice(0, 2).join(' and ');
-  const personalityDesc = selectedTraits.slice(0, 2).join(' and ');
-  const backstoryDesc = selectedBackstory[Math.floor(Math.random() * selectedBackstory.length)];
+  const additionalTraits = traits.join(', ');
 
-  const additionalTraits = traits?.join(', ') || '';
+  // Create a rich, detailed prompt with multiple descriptive elements
+  const prompt = `Highly detailed fantasy character portrait of a ${race} ${characterClass}:
+    - Wearing ${equipmentDesc}
+    - Personality: ${personality}
+    - Background: ${background}
+    ${additionalTraits ? `- Unique Traits: ${additionalTraits}` : ''}
+    
+    Artistic Style:
+    - High fantasy art style
+    - Professional illustration
+    - Intricate, realistic details
+    - Dramatic, heroic pose
+    - Epic lighting and composition
+    - Vibrant, rich color palette
+    - Sharp, clear focus on character
+    - Cinematic quality rendering`;
 
-  return `${basePrompt} equipped with ${equipmentDesc}, ${personalityDesc} personality, ${backstoryDesc} backstory, ${additionalTraits}, detailed illustration, high fantasy art style, dramatic lighting, epic composition`;
+  console.log('Constructed Detailed Prompt:', prompt);
+  return prompt;
 }
 
-// API call to Hugging Face with retry mechanism
-async function callHuggingFaceAPI(prompt: string, retries = 2): Promise<string> {
-  try {
-    const response = await axios.post(
-      'https://api-inference.huggingface.co/models/stable-diffusion-v1-5', 
-      { inputs: prompt },
-      {
-        headers: {
-          'Authorization': `Bearer ${process.env.HUGGING_FACE_API_TOKEN}`,
-          'Content-Type': 'application/json'
-        },
-        timeout: 30000, // 30 seconds timeout
-        responseType: 'arraybuffer'
-      }
-    );
+// Avatar generation function
+async function generateAvatarFromHuggingFace(
+  prompt: string, 
+  onProgress?: (progress: number) => void,
+  retries = 2
+): Promise<string> {
+  const HUGGING_FACE_MODELS = [
+    'stabilityai/stable-diffusion-xl-base-1.0',
+    'runwayml/stable-diffusion-v1-5',
+    'CompVis/stable-diffusion-v1-4'
+  ];
 
-    // Convert response to data URL
-    const base64Image = Buffer.from(response.data, 'binary').toString('base64');
-    return `data:image/png;base64,${base64Image}`;
-  } catch (error) {
-    if (retries > 0) {
-      console.warn(`API call failed. Retrying... (${retries} attempts left)`);
-      return callHuggingFaceAPI(prompt, retries - 1);
+  const updateProgress = (loaded: number, total: number) => {
+    if (onProgress) {
+      const percentCompleted = Math.round((loaded / total) * 100);
+      console.log(`Progress: ${percentCompleted}%`);
+      onProgress(percentCompleted);
     }
+  };
+
+  try {
+    const huggingFaceToken = process.env.HUGGINGFACE_API_TOKEN;
+
+    if (!huggingFaceToken) {
+      console.error('Hugging Face API Token is missing');
+      throw new Error('Hugging Face API Token (HUGGINGFACE_API_TOKEN) is not configured');
+    }
+
+    console.log('Sending request to Hugging Face API');
+    console.log('Prompt:', prompt);
+    console.log('API Token:', huggingFaceToken ? 'Token present' : 'Token missing');
+
+    // Try multiple models if one fails
+    for (const model of HUGGING_FACE_MODELS) {
+      try {
+        const response = await axios.post(
+          `https://api-inference.huggingface.co/models/${model}`, 
+          { inputs: prompt },
+          {
+            headers: {
+              'Authorization': `Bearer ${huggingFaceToken}`,
+              'Content-Type': 'application/json'
+            },
+            timeout: 30000,
+            responseType: 'arraybuffer',
+            onDownloadProgress: (progressEvent) => {
+              const { loaded, total } = progressEvent;
+              if (total) {
+                updateProgress(loaded, total);
+              }
+            }
+          }
+        );
+
+        // Simulate additional progress steps
+        onProgress?.(80);
+        await new Promise(resolve => setTimeout(resolve, 500));
+        onProgress?.(90);
+        await new Promise(resolve => setTimeout(resolve, 500));
+        onProgress?.(100);
+
+        return `data:image/png;base64,${Buffer.from(response.data, 'binary').toString('base64')}`;
+      } catch (error: unknown) {
+        const errorMessage = error instanceof Error ? error.message : String(error);
+        console.warn(`Model ${model} failed:`, errorMessage);
+        
+        // If it's the last model, rethrow the error
+        if (model === HUGGING_FACE_MODELS[HUGGING_FACE_MODELS.length - 1]) {
+          throw error;
+        }
+      }
+    }
+
+    throw new Error('All Hugging Face models failed');
+  } catch (error: unknown) {
+    console.error('=== HUGGING FACE API ERROR ===');
+    
+    if (axios.isAxiosError(error)) {
+      console.error('Axios Error Details:', {
+        response: error.response?.data ? Buffer.from(error.response.data).toString('utf-8') : 'No response data',
+        status: error.response?.status,
+        headers: error.response?.headers,
+        message: error.message,
+        config: error.config
+      });
+    } else {
+      console.error('Non-Axios Error:', error instanceof Error ? error.message : String(error));
+    }
+
     throw error;
   }
 }
+
+router.post('/generate-avatar', async (req, res) => {
+  console.log('=== FULL REQUEST DETAILS ===');
+  console.log('Request Body:', JSON.stringify(req.body, null, 2));
+  console.log('Request Headers:', JSON.stringify(req.headers, null, 2));
+  console.log('Request URL:', req.originalUrl);
+  console.log('Request Method:', req.method);
+
+  const { characterClass, race, traits, background, personality } = req.body;
+
+  try {
+    // Validate input with detailed logging
+    if (!characterClass) {
+      console.error('Missing characterClass');
+      return res.status(400).json({ 
+        error: 'Validation Error', 
+        details: 'Character class is required',
+        receivedBody: req.body
+      });
+    }
+
+    if (!race) {
+      console.error('Missing race');
+      return res.status(400).json({ 
+        error: 'Validation Error', 
+        details: 'Race is required',
+        receivedBody: req.body
+      });
+    }
+
+    // Detailed logging of input parameters
+    console.log('Input Parameters:', {
+      characterClass,
+      race,
+      traits: traits || 'No traits provided',
+      background: background || 'No background provided',
+      personality: personality || 'No personality provided'
+    });
+
+    // Generate cache key
+    const cacheKey = generateCacheKey({ characterClass, race, traits, background, personality });
+
+    // Check cache
+    const cachedAvatar = await redis.get(cacheKey);
+    if (cachedAvatar) {
+      console.log('Returning cached avatar');
+      return res.json({ avatarUrl: cachedAvatar });
+    }
+
+    // Construct prompt
+    const prompt = constructPrompt({ characterClass, race, traits, background, personality });
+    console.log('Generated Prompt:', prompt);
+
+    // Progress tracking function
+    const progressCallback = (progress: number) => {
+      console.log(`Progress update: ${progress}%`);
+      // You could use a WebSocket or Server-Sent Events here for real-time updates
+      // For now, we'll just log
+    };
+
+    // Generate avatar
+    const avatarUrl = await generateAvatarFromHuggingFace(
+      prompt, 
+      progressCallback
+    );
+
+    // Cache the avatar
+    await redis.set(cacheKey, avatarUrl, 'EX', 60 * 60 * 24); // 24-hour expiration
+
+    // Send response
+    res.json({ avatarUrl });
+  } catch (error) {
+    console.error('=== FULL ERROR DETAILS ===');
+    console.error('Error Object:', error);
+    
+    // Determine the most appropriate error response
+    if (error instanceof Error) {
+      console.error('Error Name:', error.name);
+      console.error('Error Message:', error.message);
+      console.error('Error Stack:', error.stack);
+    }
+
+    res.status(500).json({ 
+      error: 'Avatar Generation Failed', 
+      details: error instanceof Error ? error.message : 'Unknown error occurred',
+      fullError: error
+    });
+  }
+});
 
 export default router;

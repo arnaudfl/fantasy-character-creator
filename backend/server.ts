@@ -5,6 +5,7 @@ import path from 'path';
 import fs from 'fs';
 import dotenv from 'dotenv';
 import avatarRoutes from './routes/avatarRoutes';
+import redisClient from './config/redisConfig';
 
 // Load environment variables
 dotenv.config();
@@ -13,7 +14,9 @@ const app = express();
 const PORT = process.env.PORT || 5000;
 
 // Middleware
-app.use(cors());
+app.use(cors({
+  origin: process.env.FRONTEND_URL || 'http://localhost:3000'
+}));
 app.use(bodyParser.json({ limit: '10mb' }));
 app.use(express.json());
 
@@ -27,7 +30,7 @@ if (!fs.existsSync(avatarDir)) {
 }
 
 // Routes
-app.use('/api/avatars', avatarRoutes);
+app.use('/api', avatarRoutes);
 
 // Avatar Save Route
 app.post('/api/save-avatar', (req, res) => {
@@ -58,9 +61,39 @@ app.post('/api/save-avatar', (req, res) => {
   }
 });
 
+// Add Redis connection check
+app.get('/api/redis-status', async (req, res) => {
+  try {
+    await redisClient.ping();
+    res.status(200).json({ status: 'Redis is connected' });
+  } catch (error: unknown) {
+    res.status(500).json({ 
+      status: 'Redis connection failed', 
+      error: error instanceof Error ? error.message : String(error) 
+    });
+  }
+});
+
+// Error handling middleware
+app.use((err: Error, req: express.Request, res: express.Response, next: express.NextFunction) => {
+  console.error(err.stack);
+  res.status(500).json({ 
+    message: 'An unexpected error occurred',
+    error: err instanceof Error ? err.message : 'Unknown error'
+  });
+});
+
 // Start server
-app.listen(PORT, () => {
+app.listen(PORT, async () => {
   console.log(`Server running on port ${PORT}`);
+  
+  // Optional: Test Redis connection on startup
+  try {
+    await redisClient.ping();
+    console.log('Redis connected successfully');
+  } catch (error: unknown) {
+    console.error('Failed to connect to Redis', error instanceof Error ? error.message : error);
+  }
 });
 
 export default app;
