@@ -138,7 +138,7 @@ const initialCharacterState = {
   specialAbility: '',
   equipment: null,
   personality: null,
-  avatar: null,
+  avatar: '',  // Update avatar to store path as a string
   optimization: null,
   backgroundStory: null
 };
@@ -470,15 +470,13 @@ const CharacterForm = () => {
     }));
   };
 
-  const handleAvatarGenerated = (avatarUrl) => {
+  const handleAvatarGenerated = useCallback((avatarData) => {
     setFormTouched(true);
     setCharacter(prevCharacter => ({
       ...prevCharacter,
-      avatar: {
-        svgString: avatarUrl
-      }
+      avatar: avatarData.avatarPath
     }));
-  };
+  }, []);
 
   const handlePersonalityGenerate = (personality) => {
     setFormTouched(true);

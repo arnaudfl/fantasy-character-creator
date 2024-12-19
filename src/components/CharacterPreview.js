@@ -73,17 +73,35 @@ const CharacterPreview = ({ character, onUpdateAvatar }) => {
     }
   ];
 
+  const renderAvatar = () => {
+    if (!character.avatar) {
+      return <div className="no-avatar">No Avatar</div>;
+    }
+    
+    // Directly use the avatar path as the image source with a smaller size
+    return (
+      <div className="character-avatar-container">
+        <img 
+          src={character.avatar} 
+          alt={`${character.name}'s Avatar`} 
+          className="character-avatar-small" 
+        />
+      </div>
+    );
+  };
+
   return (
     <div className="character-preview">
       {/* Header */}
       <div className="preview-header">
-        <div className="preview-icon">{getCharacterIcon()}</div>
-        <div className="preview-title">
-          <h2>{character.name || 'Unnamed Character'}</h2>
-          <p className="preview-subheader">
-            {character.race} {character.class}
-          </p>
+        <h2>{character.name || 'Unnamed Character'}</h2>
+        <div className="preview-header-details">
+          <span>{character.race}</span>
+          <span>{character.class}</span>
         </div>
+        
+        {/* Avatar Preview */}
+        {renderAvatar()}
       </div>
 
       {/* Ability Scores */}

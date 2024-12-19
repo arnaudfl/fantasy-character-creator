@@ -47,7 +47,7 @@ interface CharacterDetails {
 
 interface AvatarGeneratorProps {
   characterDetails: CharacterDetails;
-  onAvatarGenerated?: (avatar: { svgString: string } | null) => void;
+  onAvatarGenerated?: (avatar: { avatarPath: string; filename: string } | null) => void;
 }
 
 const DEFAULT_AVATARS: { [key: string]: string } = {
@@ -205,22 +205,19 @@ const AvatarGenerator: React.FC<AvatarGeneratorProps> = ({
       
       if (savedAvatarPath) {
         setAvatar(savedAvatarPath);
-        // Convert image URL to SVG-like object to match form validation
-        const svgString = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 250 350">
-          <image href="${savedAvatarPath}" width="250" height="350"/>
-        </svg>`;
-        onAvatarGenerated?.({ svgString });
+        // Pass the avatar path and filename directly to onAvatarGenerated
+        onAvatarGenerated?.({ avatarPath: savedAvatarPath, filename: `${characterDetails.name.toLowerCase().replace(/\s+/g, '_')}_avatar.png` });
       } else {
         // Generate default avatar if no image is created
         const defaultAvatar = generateDefaultAvatar();
         setAvatar(defaultAvatar.url);
-        onAvatarGenerated?.({ svgString: defaultAvatar.svgString });
+        onAvatarGenerated?.({ avatarPath: defaultAvatar.url, filename: `${characterDetails.name.toLowerCase().replace(/\s+/g, '_')}_avatar.png` });
       }
     } catch (err) {
       // Generate default avatar on error
       const defaultAvatar = generateDefaultAvatar();
       setAvatar(defaultAvatar.url);
-      onAvatarGenerated?.({ svgString: defaultAvatar.svgString });
+      onAvatarGenerated?.({ avatarPath: defaultAvatar.url, filename: `${characterDetails.name.toLowerCase().replace(/\s+/g, '_')}_avatar.png` });
       
       setError('An unexpected error occurred.');
       console.error(err);

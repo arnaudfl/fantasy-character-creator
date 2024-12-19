@@ -1,11 +1,13 @@
 # Fantasy Character Creator
 
 ## Overview
+
 Fantasy Character Creator is an interactive web application that allows users to create detailed and unique characters for tabletop role-playing games, such as Dungeons & Dragons. The app provides a comprehensive character creation experience with features like ability score generation, equipment selection, personality trait generation, and avatar creation.
 
 ## Features
 
 ### Character Creation Workflow
+
 - **Ability Score Generation**
   - Manual point-buy system
   - 4d6 drop lowest dice roll method
@@ -29,16 +31,20 @@ Fantasy Character Creator is an interactive web application that allows users to
   - Background creation
 
 - **Avatar Generation**
-  - Custom SVG avatar creation
-  - Unique character visual representation
+  - AI-powered avatar creation using Hugging Face API
+  - Automatic saving of avatars in project directory
+  - Unique, URL-friendly avatar filenames
+  - Circular avatar preview in character details
 
 ### Additional Features
+
 - Dark/Light theme toggle
 - Character saving and sharing
 - Responsive design
 - Guided character creation process
 
 ## Technologies Used
+
 - React
 - React Hooks
 - Context API
@@ -49,35 +55,96 @@ Fantasy Character Creator is an interactive web application that allows users to
 ## Getting Started
 
 ### Prerequisites
-- Node.js (v14 or later)
-- npm (v6 or later)
 
-### Installation
+- Node.js (v18 or later)
+- npm (v9 or later)
+- Git
+
+### Environment Setup
+
 1. Clone the repository
+
    ```bash
    git clone https://github.com/yourusername/fantasy-character-creator.git
-   ```
-
-2. Navigate to the project directory
-   ```bash
    cd fantasy-character-creator
    ```
 
-3. Install dependencies
+2. Create a `.env` file in the project root
+
+   ```bash
+   touch .env
+   ```
+
+3. Add the following environment variables to `.env`
+
+   ```bash
+   REACT_APP_API_BASE_URL=http://localhost:5000
+   HUGGING_FACE_API_KEY=your_hugging_face_api_key
+   ```
+
+4. Install dependencies
+
    ```bash
    npm install
    ```
 
-4. Start the development server
-   ```bash
-   npm start
-   ```
+### Running the Application
 
-5. Open [http://localhost:3000](http://localhost:3000) to view the app in your browser
+#### Development Mode
+
+Start both frontend and backend concurrently:
+
+```bash
+npm run dev
+```
+
+#### Frontend Only
+
+```bash
+npm start
+```
+
+#### Backend Only
+
+```bash
+npm run start-backend
+```
+
+### Building for Production
+
+```bash
+npm run build
+```
+
+This command will:
+
+- Compile the React frontend
+- Transpile the backend TypeScript files
+- Prepare the character avatars directory
+- Generate production-ready build artifacts
+
+### Additional Configuration
+
+- Modify `src/config/` files to customize character creation options
+- Update environment variables in `.env` for API integrations
+
+### Troubleshooting
+
+- Ensure all dependencies are installed correctly
+- Check console for any error messages
+- Verify API keys and environment configurations
+
+### API Dependencies
+
+- Hugging Face API (for avatar generation)
+- Local Express backend
+- Axios for HTTP requests
 
 ## Customization
+
 - Modify `src/data/` JSON files to add more races, classes, equipment, and personality traits
 - Adjust theme variables in `src/styles/globalVariables.css`
 
 ## License
+
 This project is open-source and available under the MIT License.
