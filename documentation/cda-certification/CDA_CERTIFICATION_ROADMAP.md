@@ -114,6 +114,8 @@ The Concepteur Développeur d'Applications (CDA) certification is a professional
 - [Future Improvement Roadmap](/documentation/cda-certification/future-improvement-roadmap.md)
 - [Technical Documentation](/documentation/cda-certification/technical-docs/system-architecture-v1.md)
 - [Performance and Security Analysis](/documentation/cda-certification/performance-security-analysis.md)
+- [Professional Experience](/documentation/cda-certification/professional-experience.md)
+- [Project Management Artifacts](/documentation/cda-certification/project-management-artifacts.md)
 
 ### Progress Tracking
 - All required documentation components completed
