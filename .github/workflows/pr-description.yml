@@ -1,0 +1,48 @@
+name: Generate PR Description
+
+on:
+  pull_request:
+    branches:
+      - main
+      - develop
+
+jobs:
+  generate-pr-description:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+        with:
+          fetch-depth: 0  # Fetches full history for accurate commit comparison
+
+      - name: Generate PR Description
+        id: generate-description
+        run: |
+          # Get base and head branches
+          BASE_BRANCH=${{ github.base_ref }}
+          HEAD_BRANCH=${{ github.head_ref }}
+
+          # Generate commit summary
+          echo "## Changes in this Pull Request" > pr_description.md
+          echo "" >> pr_description.md
+          echo "### Commit Summary" >> pr_description.md
+          git log "${BASE_BRANCH}..${HEAD_BRANCH}" --pretty=format:"- %s" | sort | uniq >> pr_description.md
+
+          echo "" >> pr_description.md
+          echo "### Detailed Changes" >> pr_description.md
+          git log "${BASE_BRANCH}..${HEAD_BRANCH}" --stat >> pr_description.md
+
+      - name: Update Pull Request Description
+        uses: actions/github-script@v6
+        with:
+          github-token: ${{secrets.GITHUB_TOKEN}}
+          script: |
+            const fs = require('fs');
+            const prDescription = fs.readFileSync('pr_description.md', 'utf8');
+            
+            github.rest.pulls.update({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              pull_number: context.issue.number,
+              body: prDescription
+            })
