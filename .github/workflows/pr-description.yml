@@ -18,19 +18,26 @@ jobs:
       - name: Generate PR Description
         id: generate-description
         run: |
+          # Fetch all branches
+          git fetch --all
+
           # Get base and head branches
           BASE_BRANCH=${{ github.base_ref }}
           HEAD_BRANCH=${{ github.head_ref }}
+
+          # Ensure branches exist locally
+          git checkout -b "${BASE_BRANCH}" "origin/${BASE_BRANCH}" || true
+          git checkout -b "${HEAD_BRANCH}" "origin/${HEAD_BRANCH}" || true
 
           # Generate commit summary
           echo "## Changes in this Pull Request" > pr_description.md
           echo "" >> pr_description.md
           echo "### Commit Summary" >> pr_description.md
-          git log "${BASE_BRANCH}..${HEAD_BRANCH}" --pretty=format:"- %s" | sort | uniq >> pr_description.md
+          git log "origin/${BASE_BRANCH}..origin/${HEAD_BRANCH}" --pretty=format:"- %s" | sort | uniq >> pr_description.md
 
           echo "" >> pr_description.md
           echo "### Detailed Changes" >> pr_description.md
-          git log "${BASE_BRANCH}..${HEAD_BRANCH}" --stat >> pr_description.md
+          git log "origin/${BASE_BRANCH}..origin/${HEAD_BRANCH}" --stat >> pr_description.md
 
       - name: Update Pull Request Description
         uses: actions/github-script@v6
