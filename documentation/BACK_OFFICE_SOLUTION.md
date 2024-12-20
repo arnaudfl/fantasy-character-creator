@@ -1,290 +1,191 @@
-# Fantasy Character Creator: Authentication & Back Office Solution
+# Fantasy Character Creator: Back Office Authentication Solution
 
-## Project Authentication Implementation Strategy
+## Table of Contents
+1. [Project Overview](#project-overview)
+2. [Project Structure](#project-structure)
+3. [Authentication Flow](#authentication-flow)
+4. [User Model](#user-model)
+5. [Token Management](#token-management)
+6. [Security Considerations](#security-considerations)
+7. [Logging Strategy](#logging-strategy)
+8. [Environment Configuration](#environment-configuration)
+9. [Future Enhancements](#future-enhancements)
 
-### 1. Dependency Installation
+## Project Overview
+The Back Office Authentication Solution provides a robust, secure, and scalable authentication system for the Fantasy Character Creator project, focusing on role-based access control, secure token management, and comprehensive security measures.
 
-#### Authentication Dependencies
-```bash
-npm install passport passport-jwt jsonwebtoken bcrypt
-npm install -D @types/passport @types/passport-jwt @types/jsonwebtoken @types/bcrypt
-```
-
-### 2. Project Structure Preparation
-
-#### Recommended Backend Structure
+## Project Structure
 ```
 backend/
 ├── config/
-│   └── passport.ts          # Passport configuration
+│   ├── passport.ts          # Passport configuration
+│   ├── logger.ts            # Logging configuration
+│   └── securityMiddleware.ts # Security middleware configuration
 ├── middleware/
-│   └── authMiddleware.ts    # Authentication middleware
+│   ├── authMiddleware.ts    # Authentication middleware
+│   └── securityMiddleware.ts # Security middleware
 ├── models/
-│   └── User.ts              # User model definition
+│   ├── User.ts              # User model definition
+│   ├── AuditLog.ts          # Audit log model definition
+│   └── RefreshToken.ts      # Refresh token model
 ├── routes/
 │   ├── authRoutes.ts        # Authentication routes
 │   └── adminRoutes.ts       # Admin-specific routes
 ├── services/
-│   ├── authService.ts       # Authentication business logic
-│   └── tokenService.ts      # Token management
-└── types/
-    └── express.d.ts         # TypeScript type augmentation
+│   └── tokenService.ts      # Token management service
+└── utils/
+    └── validation.ts        # Input validation utilities
 ```
 
-### 3. User Model Definition
+## Authentication Flow
+1. User Registration
+   - Validate input (email, password)
+   - Check for existing user
+   - Hash password
+   - Create user
+   - Generate token pair
+   - Store refresh token
 
-#### Prisma Schema Enhancement
-```typescript
-// prisma/schema.prisma
-model User {
-  id        String    @id @default(uuid())
-  email     String    @unique
-  password  String
-  role      UserRole  @default(USER)
-  profile   Profile?
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-}
+2. User Login
+   - Validate credentials
+   - Generate token pair
+   - Store refresh token
+   - Return access and refresh tokens
 
+3. Token Refresh
+   - Validate refresh token
+   - Check token in database
+   - Generate new token pair
+   - Invalidate old refresh token
+
+## User Model
+```prisma
 enum UserRole {
   USER
   ADMIN
   SUPER_ADMIN
 }
 
-model Profile {
+model User {
   id        String   @id @default(uuid())
-  userId    String   @unique
-  firstName String?
-  lastName  String?
+  email     String   @unique
+  password  String
+  role      UserRole @default(USER)
+  profile   Profile?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model RefreshToken {
+  id        String   @id @default(uuid())
+  userId    String
+  token     String   @unique
+  expiresAt DateTime
   user      User     @relation(fields: [userId], references: [id])
+}
+
+model AuditLog {
+  id        String   @id @default(uuid())
+  userId    String?
+  action    String
+  details   Json?
+  ipAddress String?
+  timestamp DateTime @default(now())
+  user      User?    @relation(fields: [userId], references: [id])
 }
 ```
 
-### 4. Authentication Configuration
-
-#### Passport JWT Strategy
+## Token Management
+### Token Service
 ```typescript
-// backend/config/passport.ts
-import passport from 'passport';
-import { Strategy as JwtStrategy, ExtractJwt } from 'passport-jwt';
-import { PrismaClient } from '@prisma/client';
-
-const prisma = new PrismaClient();
-
-const jwtOptions = {
-  jwtFromRequest: ExtractJwt.fromAuthHeaderAsBearerToken(),
-  secretOrKey: process.env.JWT_SECRET || 'fallback_secret'
-};
-
-passport.use(new JwtStrategy(jwtOptions, async (payload, done) => {
-  try {
-    const user = await prisma.user.findUnique({
-      where: { id: payload.id }
-    });
-
-    if (user) {
-      return done(null, user);
-    }
-    return done(null, false);
-  } catch (error) {
-    return done(error, false);
-  }
-}));
+class TokenService {
+  static generateAccessToken(user: User): string
+  static generateRefreshToken(user: User): string
+  static createTokenPair(user: User): TokenPair
+  static storeRefreshToken(userId: string, refreshToken: string): Promise<void>
+  static refreshTokens(refreshToken: string): Promise<TokenPair | null>
+}
 ```
 
-### 5. Authentication Middleware
+### Token Configuration
+- Access Token: 15 minutes expiration
+- Refresh Token: 7 days expiration
+- Separate secrets for JWT and Passport
+- Token rotation mechanism
 
-#### Role-Based Access Control
-```typescript
-// backend/middleware/authMiddleware.ts
-import { Request, Response, NextFunction } from 'express';
-import passport from 'passport';
-import { UserRole } from '@prisma/client';
+## Security Considerations
+1. Input Validation
+   - Email format validation
+   - Strong password requirements
+   - Sanitize and normalize inputs
 
-export const isAuthenticated = (req: Request, res: Response, next: NextFunction) => {
-  passport.authenticate('jwt', { session: false }, (err, user) => {
-    if (err) return next(err);
-    if (!user) return res.status(401).json({ message: 'Unauthorized' });
-    
-    req.user = user;
-    next();
-  })(req, res, next);
-};
+2. Rate Limiting
+   - 100 requests per 15 minutes
+   - Prevent brute-force attacks
+   - Configurable limits
 
-export const checkRole = (roles: UserRole[]) => {
-  return (req: Request, res: Response, next: NextFunction) => {
-    if (!req.user) {
-      return res.status(401).json({ message: 'Unauthorized' });
-    }
+3. CORS Protection
+   - Restrict allowed origins
+   - Define allowed methods
+   - Prevent unauthorized requests
 
-    if (roles.includes(req.user.role)) {
-      return next();
-    }
+4. Security Headers
+   - Helmet middleware
+   - Content Security Policy
+   - Prevent web vulnerabilities
 
-    return res.status(403).json({ message: 'Insufficient permissions' });
-  };
-};
-```
+5. Request Size Limiting
+   - 10KB payload limit
+   - Prevent DoS attacks
 
-### 6. Authentication Routes
+6. Error Handling
+   - Global error handler
+   - Contextual logging
+   - Production-safe responses
 
-#### Login and Registration
-```typescript
-// backend/routes/authRoutes.ts
-import express from 'express';
-import bcrypt from 'bcrypt';
-import jwt from 'jsonwebtoken';
-import { PrismaClient, UserRole } from '@prisma/client';
+## Logging Strategy
+### Logging Configuration
+- Winston logging library
+- Daily log rotation
+- Console and file transports
+- Configurable log levels
 
-const router = express.Router();
-const prisma = new PrismaClient();
+### Logged Events
+- Authentication attempts
+- Token generation/refresh
+- Security-related activities
+- Error tracking
 
-router.post('/register', async (req, res) => {
-  try {
-    const { email, password, role = UserRole.USER } = req.body;
-
-    const existingUser = await prisma.user.findUnique({ where: { email } });
-    if (existingUser) {
-      return res.status(400).json({ message: 'User already exists' });
-    }
-
-    const hashedPassword = await bcrypt.hash(password, 10);
-
-    const user = await prisma.user.create({
-      data: {
-        email,
-        password: hashedPassword,
-        role
-      }
-    });
-
-    res.status(201).json({ message: 'User registered successfully' });
-  } catch (error) {
-    res.status(500).json({ message: 'Registration failed' });
-  }
-});
-
-router.post('/login', async (req, res) => {
-  try {
-    const { email, password } = req.body;
-
-    const user = await prisma.user.findUnique({ where: { email } });
-    if (!user) {
-      return res.status(401).json({ message: 'Invalid credentials' });
-    }
-
-    const isPasswordValid = await bcrypt.compare(password, user.password);
-    if (!isPasswordValid) {
-      return res.status(401).json({ message: 'Invalid credentials' });
-    }
-
-    const token = jwt.sign(
-      { id: user.id, role: user.role },
-      process.env.JWT_SECRET || 'fallback_secret',
-      { expiresIn: '1h' }
-    );
-
-    res.json({ token, user: { id: user.id, email: user.email, role: user.role } });
-  } catch (error) {
-    res.status(500).json({ message: 'Login failed' });
-  }
-});
-
-export default router;
-```
-
-### 7. Admin Routes Protection
-
-#### Secure Admin Endpoints
-```typescript
-// backend/routes/adminRoutes.ts
-import express from 'express';
-import { PrismaClient } from '@prisma/client';
-import { isAuthenticated, checkRole } from '../middleware/authMiddleware';
-
-const router = express.Router();
-const prisma = new PrismaClient();
-
-router.get('/users', 
-  isAuthenticated, 
-  checkRole(['ADMIN', 'SUPER_ADMIN']), 
-  async (req, res) => {
-    try {
-      const users = await prisma.user.findMany({
-        select: { 
-          id: true, 
-          email: true, 
-          role: true 
-        }
-      });
-      res.json(users);
-    } catch (error) {
-      res.status(500).json({ message: 'Failed to retrieve users' });
-    }
-});
-
-export default router;
-```
-
-### 8. Environment Configuration
-
-#### .env File
+## Environment Configuration
 ```env
-# Authentication
-JWT_SECRET=your_very_long_and_secure_random_string
-JWT_EXPIRATION=1h
+# Authentication Secrets
+JWT_SECRET=your_very_long_and_secure_random_string_for_jwt
+PASSPORT_JWT_SECRET=another_equally_long_and_secure_random_string_for_passport
+REFRESH_TOKEN_SECRET=secure_refresh_token_secret
 
-# Optional: Additional security settings
-PASSWORD_SALT_ROUNDS=10
+# Token Configuration
+ACCESS_TOKEN_EXPIRATION=15m
+REFRESH_TOKEN_EXPIRATION=7d
+
+# Database Configuration
+DATABASE_URL="postgresql://username:password@localhost:5432/fantasy_character_db"
+
+# Logging Configuration
+LOG_LEVEL=info
+LOG_MAX_FILES=14
+LOG_MAX_SIZE=20m
+
+# Security Configuration
+ALLOWED_ORIGINS=http://localhost:3000,https://yourdomain.com
+MAX_REQUEST_PAYLOAD=10kb
 ```
 
-### 9. Server Integration
-
-#### Express Server Setup
-```typescript
-// backend/server.ts
-import express from 'express';
-import passport from 'passport';
-import authRoutes from './routes/authRoutes';
-import adminRoutes from './routes/adminRoutes';
-import './config/passport';  // Import passport configuration
-
-const app = express();
-
-app.use(express.json());
-app.use(passport.initialize());
-
-app.use('/auth', authRoutes);
-app.use('/admin', adminRoutes);
-
-const PORT = process.env.PORT || 5000;
-app.listen(PORT, () => {
-  console.log(`Server running on port ${PORT}`);
-});
-```
-
-### 10. Testing Strategy
-
-#### Authentication Test Scenarios
-- User registration
-- Login with valid/invalid credentials
-- Token generation
-- Role-based access control
-- Admin route protection
-
-### 11. Security Considerations
-- Use strong, randomly generated JWT secret
-- Implement password complexity rules
-- Add rate limiting to authentication endpoints
-- Log authentication attempts
-- Implement token refresh mechanism
-
-### 12. Future Enhancements
-- Multi-factor authentication
-- OAuth integration
-- Advanced anomaly detection
-- Comprehensive audit logging
+## Future Enhancements
+1. Multi-factor Authentication
+2. Social Login Integration
+3. Advanced Anomaly Detection
+4. Comprehensive Audit Logging
+5. Enhanced Role-Based Access Control
 
 ## Conclusion
-This implementation provides a robust, secure authentication system tailored to the Fantasy Character Creator project, offering flexible role-based access control and comprehensive security features.
+This authentication solution provides a secure, flexible, and scalable approach to managing user access in the Fantasy Character Creator project, with a strong emphasis on security, performance, and maintainability.
