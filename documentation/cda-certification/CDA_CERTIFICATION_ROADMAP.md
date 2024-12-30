@@ -5,13 +5,14 @@ The Concepteur Développeur d'Applications (CDA) certification is a professional
 
 ## 🎯 Competency Blocks Alignment
 
-### Bloc 1: User Interface Development (Web & Mobile)
-#### Certification Requirements
-- [ ] Create application wireframes
-- [ ] Develop responsive web/mobile interfaces
-- [ ] Design user-centric UI/UX
-- [ ] Create and manage databases
-- [ ] Implement data access components
+### Bloc 1: Application Design and Modeling
+
+#### Design Requirements
+- [x] Create application wireframes
+- [x] Define user interaction flows
+- [x] Develop design system
+- [x] Accessibility considerations
+- [📄 Detailed Wireframe Documentation](/documentation/cda-certification/technical-docs/application-wireframes.md)
 
 #### Project Alignment
 - [x] React TypeScript frontend
@@ -102,10 +103,40 @@ The Concepteur Développeur d'Applications (CDA) certification is a professional
 
 ### Recommended Sections
 1. Project Overview
+   - [x] Project motivation
+   - [x] Problem statement
+   - [x] Target audience
+   - [x] User personas
+   - [x] Unique value proposition
+   - [📄 Detailed Document](/documentation/cda-certification/technical-docs/project-overview.md)
+
 2. Technical Architecture
+   - [x] Detailed technology stack rationale
+   - [x] Deployment architecture
+   - [x] Integration patterns
+   - [x] Future technology considerations
+   - [📄 Detailed Document](/documentation/cda-certification/technical-docs/technical-architecture.md)
+
 3. Development Challenges
+   - [ ] Technical challenges encountered
+   - [ ] Innovative solutions implemented
+   - [ ] AI-driven avatar generation complexity
+   - [ ] Performance optimization strategies
+   - [ ] Scalability and user experience handling
+
 4. Innovation Highlights
+   - [ ] AI-driven character creation approach
+   - [ ] Advanced frontend and backend technologies
+   - [ ] Microservices and serverless architecture
+   - [ ] Creative problem-solving techniques
+   - [ ] Cutting-edge design patterns
+
 5. Personal Reflection
+   - [ ] Personal growth and learning
+   - [ ] Key technical skills developed
+   - [ ] Soft skills improvement
+   - [ ] Challenges overcome
+   - [ ] Professional development insights
 
 ## 📝 Documentation References
 
