@@ -32,7 +32,7 @@
     "prebuild": "npm run build:avatars",
     "test": "react-scripts test",
     "eject": "react-scripts eject",
-    "prepare": "husky install",
+    "prepare": "husky",
     "stop:redis": "docker-compose down"
   },
   "eslintConfig": {
@@ -59,6 +59,7 @@
     "@types/ioredis": "^5.0.0",
     "@types/react": "^19.0.2",
     "@types/uuid": "^9.0.8",
+    "husky": "^9.1.7",
     "ts-node": "^10.9.2"
   }
 }
