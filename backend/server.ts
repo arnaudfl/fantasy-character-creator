@@ -6,16 +6,20 @@ import fs from 'fs';
 import dotenv from 'dotenv';
 import avatarRoutes from './routes/avatarRoutes';
 import redisClient from './config/redisConfig';
+import authRoutes from './routes/authRoutes';
+import helmet from 'helmet';
 
 // Load environment variables
 dotenv.config();
 
 const app = express();
-const PORT = process.env.PORT || 5000;
+const PORT = process.env.API_PORT || 5000;
 
 // Middleware
+app.use(helmet());
 app.use(cors({
-  origin: process.env.FRONTEND_URL || 'http://localhost:3000'
+  origin: process.env.ALLOWED_ORIGINS?.split(',') || ['http://localhost:3000'],
+  credentials: true
 }));
 app.use(bodyParser.json({ limit: '10mb' }));
 app.use(express.json());
@@ -31,6 +35,7 @@ if (!fs.existsSync(avatarDir)) {
 
 // Routes
 app.use('/api', avatarRoutes);
+app.use('/api/auth', authRoutes);
 
 // Avatar Save Route
 app.post('/api/save-avatar', (req, res) => {
