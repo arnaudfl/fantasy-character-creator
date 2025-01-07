@@ -1,4 +1,31 @@
-# Changelog
+## [1.4.0] - 2025-01-07
+
+### 📝 Documentation Enhancements
+- Comprehensive update to CDA Certification Roadmap
+- Detailed mapping of project achievements to certification requirements
+- Expanded documentation of technical accomplishments
+- Marked key project milestones as completed
+
+### 🎓 Certification Roadmap Updates
+- Completed Bloc 1: Application Design and Modeling
+  - Validated design system implementation
+  - Confirmed advanced UX workflow
+  - Documented character creation interface achievements
+
+- Completed Bloc 2: Back-End Component Development
+  - Verified database design and data access components
+  - Confirmed RESTful API implementation
+  - Validated secure authentication mechanisms
+
+- Completed Bloc 3: Full-Stack Application Development
+  - Documented infrastructure and deployment strategies
+  - Validated microservices-compatible architecture
+  - Confirmed comprehensive test coverage
+
+### 🚀 Continuous Improvement
+- Ongoing refinement of project documentation
+- Systematic tracking of technical achievements
+- Preparation for professional certification submission# Changelog
 
 ## [1.3.0] - 2024-12-20
 
