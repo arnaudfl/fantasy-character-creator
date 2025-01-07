@@ -11,6 +11,13 @@
 # production
 /build
 
+# documentation
+/documentation/cda-devops
+/documentation/cda-certification/bloc-documentation
+
+# examples
+/examples
+
 # misc
 .DS_Store
 .env
