@@ -1,5 +1,5 @@
-import React, { createContext, useContext, useState, useEffect } from 'react';
-import { loginUser, registerUser, logoutUser, refreshToken } from '../services/authService';
+import React, { createContext, useContext, useState } from 'react';
+import { loginUser, registerUser, logoutUser } from '../services/authService';
 
 interface User {
   id: string;
@@ -20,32 +20,15 @@ const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
 export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const [user, setUser] = useState<User | null>(null);
-  const [isLoading, setIsLoading] = useState(true);
+  const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
-
-  useEffect(() => {
-    // Check for stored auth data on mount
-    const storedUser = localStorage.getItem('user');
-    const storedToken = localStorage.getItem('refreshToken');
-    
-    if (storedUser && storedToken) {
-      setUser(JSON.parse(storedUser));
-      // Optionally refresh token here
-    }
-    
-    setIsLoading(false);
-  }, []);
 
   const login = async (email: string, password: string) => {
     try {
       setError(null);
       setIsLoading(true);
       const response = await loginUser({ email, password });
-      
       setUser(response.user);
-      localStorage.setItem('user', JSON.stringify(response.user));
-      localStorage.setItem('accessToken', response.accessToken);
-      localStorage.setItem('refreshToken', response.refreshToken);
     } catch (err: any) {
       setError(err.response?.data?.message || 'Login failed');
       throw err;
@@ -59,11 +42,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       setError(null);
       setIsLoading(true);
       const response = await registerUser({ email, password });
-      
       setUser(response.user);
-      localStorage.setItem('user', JSON.stringify(response.user));
-      localStorage.setItem('accessToken', response.accessToken);
-      localStorage.setItem('refreshToken', response.refreshToken);
     } catch (err: any) {
       setError(err.response?.data?.message || 'Registration failed');
       throw err;
@@ -75,14 +54,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const logout = async () => {
     try {
       await logoutUser();
-      
-      // Clear all auth data
       setUser(null);
-      localStorage.removeItem('user');
-      localStorage.removeItem('accessToken');
-      localStorage.removeItem('refreshToken');
-      
-      // Clear any other auth-related state
       setError(null);
     } catch (err: any) {
       setError(err.response?.data?.message || 'Logout failed');
