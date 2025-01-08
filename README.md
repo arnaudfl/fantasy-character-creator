@@ -1,56 +1,100 @@
 # Fantasy Character Creator 🎲🧙‍♀️
 
 ## 🌟 Project Vision
-An advanced, AI-powered platform for creating immersive fantasy characters, blending cutting-edge technology with creative storytelling.
+
+An advanced, AI-powered platform for creating and managing fantasy characters, blending cutting-edge technology with creative storytelling.
 
 ## 🚀 Key Features
 
+### 🎭 Character Management
+
+- Complete Character Creation System
+- Ability Score Management
+- Equipment & Inventory System
+- Character Background Generation
+- Personality Trait System
+- Character Avatar Integration
+
 ### 🤖 AI-Powered Capabilities
+
 - Dynamic Avatar Generation
 - Procedural Background Story Creation
 - Intelligent Character Trait Recommendations
 - Advanced Character Visualization
 
-### 🔐 Robust Authentication
-- Secure JWT Token Management
-- Multi-Factor Authentication
-- Role-Based Access Control
-- Social Login Integration
+### 🔐 Authentication & Security
 
-### 🎨 Character Creation
-- Comprehensive Race and Class Selection
-- Advanced Ability Score Generation
-- Interactive Character Preview
-- Emoji and Image-Based Character Icons
+- Secure JWT Token Management
+- HTTP-Only Cookie Authentication
+- Role-Based Access Control
+- Protected Character Routes
 
 ## 🏗️ Technical Architecture
 
 ### Core Technology Stack
+
 - **Backend:** Node.js, Express, TypeScript
 - **Database:** PostgreSQL with Prisma ORM
-- **Authentication:** JWT, Passport.js
-- **Frontend:** React, Next.js
+- **Authentication:** JWT with HTTP-Only Cookies
+- **Frontend:** React, TypeScript
 - **AI Integration:** Hugging Face Stable Diffusion
 - **State Management:** Redux/Zustand
 - **Testing:** Jest, React Testing Library
 
-### System Design Principles
-- Modular Architecture
-- Microservices-Ready
-- Event-Driven Components
-- Scalable Authentication
-- Performance Optimization
+### Data Models
+
+```prisma
+model User {
+  id            String         @id @default(uuid())
+  email         String         @unique
+  password      String
+  role          UserRole      @default(USER)
+  refreshTokens RefreshToken[]
+  characters    Character[]
+  createdAt     DateTime      @default(now())
+  updatedAt     DateTime      @updatedAt
+}
+
+model Character {
+  id                  String   @id @default(uuid())
+  name                String
+  race                String
+  class               String
+  background          String?
+  strength            Int      @default(10)
+  dexterity          Int      @default(10)
+  constitution       Int      @default(10)
+  intelligence       Int      @default(10)
+  wisdom             Int      @default(10)
+  charisma           Int      @default(10)
+  baseAbilityScores  Json
+  totalAbilityScores Json
+  raceAbilityModifiers Json
+  specialAbility     String?
+  equipment          Json?
+  personality        Json?
+  avatar             String?
+  optimization       Json?
+  backgroundStory    String?
+  userId             String
+  user               User     @relation(fields: [userId], references: [id])
+  createdAt          DateTime @default(now())
+  updatedAt          DateTime @updatedAt
+}
+```
 
 ## 🔧 Environment Setup
 
 ### Prerequisites
+
 - Node.js (v18+)
 - PostgreSQL
-- Redis
-- Docker (Optional)
-- Hugging Face API Token
+- Redis (optional)
+- Docker (optional)
+- Hugging Face API Token (optional)
 
 ### Installation Steps
+
 ```bash
 # Clone the repository
 git clone https://github.com/yourusername/fantasy-character-creator.git
@@ -65,101 +109,126 @@ npm install
 cp .env.example .env
 # Edit .env with your configurations
 
-# Initialize database
-npx prisma migrate dev
-npx prisma generate
+# Generate Prisma client and run migrations
+npm run prisma:generate
+npm run prisma:migrate
 
-# Start development servers
-npm run dev:backend
-npm run dev:frontend
+# Start development servers (both frontend and backend)
+npm run start:all
+npm run start
 ```
 
-### Docker Deployment
-```bash
-# Build and start all services
-docker-compose up --build
+### Environment Variables
 
-# Stop services
-docker-compose down
+```env
+# .env.example
+DATABASE_URL="postgresql://user:password@localhost:5432/dbname"
+JWT_SECRET="your-jwt-secret"
+COOKIE_SECRET="your-cookie-secret"
+REACT_APP_API_BASE_URL="http://localhost:5000"
 ```
 
 ## 🛡️ Security Features
+
+- HTTP-Only Cookies for Token Storage
+- CORS Protection
 - Input Validation
 - Rate Limiting
-- CORS Protection
-- JWT Token Management
 - Secure Password Hashing
-- Comprehensive Logging
+- Protected Character Routes
 - Error Handling Middleware
 
-## 🤝 Authentication Workflow
-1. User Registration
-2. Login with JWT
-3. Token Refresh Mechanism
-4. Role-Based Access Control
-5. Optional Multi-Factor Authentication
+## 🔄 API Endpoints
+
+### Authentication
+
+- POST /api/auth/register
+- POST /api/auth/login
+- POST /api/auth/logout
+
+### Characters
+
+- GET /api/characters
+- POST /api/characters
+- GET /api/characters/:id
+- PUT /api/characters/:id
+- DELETE /api/characters/:id
 
 ## 🧪 Testing
-- Comprehensive Unit Tests
-- Integration Tests
-- Security Vulnerability Checks
-- Performance Benchmarking
 
-## 📊 Performance Metrics
-- Efficient Database Queries
+```bash
+# Run all tests
+npm test
+
+# Run specific test suite
+npm test -- character
+
+# Run with coverage
+npm test -- --coverage
+```
+
+## 📊 Performance Features
+
+- Database Query Optimization
+- JSON Field Handling
 - Caching Strategies
-- Lazy Loading
-- Optimized AI Image Generation
+- Protected Routes
+- Error Boundary Implementation
 
-## 🌐 Roadmap
+## 🌐 Deployment
+
+```bash
+# Build frontend
+npm run build
+
+# Production start
+npm start
+
+# Using Docker
+docker-compose up --build
+```
+
+## 🎯 Roadmap
+
 ### Current Phase
-- [x] Core Character Creation
-- [x] AI Avatar Generation
-- [x] Authentication System
 
-### Upcoming Enhancements
-- [ ] Multi-Factor Authentication
-- [ ] Social Login Integration
-- [ ] Advanced Machine Learning Features
-- [ ] Community Character Sharing
+- [x] User Authentication System
+- [x] Basic Character Creation
+- [x] Character-User Relationships
+- [x] Ability Score System
 
-## 🤖 Machine Learning
-- AI-Powered Character Trait Generation
-- Intelligent Recommendation Engine
-- Natural Language Processing
-- Adaptive Character Creation
+### Upcoming Features
 
-## 🌈 Internationalization
-- Multi-Language Support
-- Culturally Diverse Character Options
-- Localized UI/UX
+- [ ] Character Sharing
+- [ ] Advanced Search
+- [ ] Character Templates
+- [ ] Real-time Collaboration
 
 ## 🤝 Contributing
+
 1. Fork the Repository
 2. Create Feature Branch
 3. Commit Changes
 4. Push to Branch
 5. Open Pull Request
 
-### Contribution Guidelines
+### Development Guidelines
+
 - Follow TypeScript Best Practices
-- Write Comprehensive Tests
+- Write Unit Tests
 - Document New Features
-- Maintain Code Quality
+- Follow ESLint Rules
 
 ## 📜 License
-[Your Chosen Open Source License]
 
-## 📞 Contact & Support
-- Project Maintainer: [Your Name]
-- Email: [Your Professional Email]
+[MIT License]
+
+## 📞 Support
+
 - Issues: GitHub Issues Page
-
-## 🙌 Acknowledgements
-- Hugging Face
-- Open Source Community
-- Fantasy & RPG Enthusiasts
+- Email: [Your Email]
+- Documentation: [Link to Docs]
 
 ---
 
-**Built with ❤️ for Creators and Storytellers**
+**Built with ❤️ for Fantasy RPG Enthusiasts**
