@@ -2,6 +2,7 @@
     "conventionalCommits.scopes": [
         "github-actions",
         "authentication",
-        "build"
+        "build",
+        "documentation"
     ]
 }
