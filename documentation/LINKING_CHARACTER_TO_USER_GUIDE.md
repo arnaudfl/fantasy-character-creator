@@ -887,7 +887,7 @@ export const CharacterList: React.FC = () => {
 
 ### 8. Deployment Considerations
 
-1. **Environment Variables**
+#### 1. **Environment Variables**
 
 ```env
 # .env.example
@@ -897,7 +897,7 @@ JWT_SECRET="your-jwt-secret"
 COOKIE_SECRET="your-cookie-secret"
 ```
 
-2. **Database Migrations**
+#### 2. **Database Migrations**
 
 ```bash
 # Production migration
@@ -907,7 +907,7 @@ npx prisma migrate deploy
 npx prisma db seed
 ```
 
-3. **Security Checklist**
+#### 3. **Security Checklist**
 
 - [ ] Enable CORS with appropriate origins
 - [ ] Set secure cookie options
@@ -916,7 +916,7 @@ npx prisma db seed
 - [ ] Implement request validation
 - [ ] Set up logging and monitoring
 
-4. **Performance Optimization**
+#### 4. **Performance Optimization**
 
 - [ ] Implement caching for character data
 - [ ] Optimize database queries
