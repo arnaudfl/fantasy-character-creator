@@ -17,6 +17,7 @@
 
 # examples
 /examples
+/logs
 
 # misc
 .DS_Store
