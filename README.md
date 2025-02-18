@@ -1,5 +1,7 @@
 # Fantasy Character Creator 🎲🧙‍♀️
 
+![Fantasy Character Creator](./documentation/fantasy-character-creator.png)
+
 ## 🌟 Project Vision
 
 An advanced, AI-powered platform for creating and managing fantasy characters, blending cutting-edge technology with creative storytelling.
