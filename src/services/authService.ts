@@ -45,4 +45,13 @@ export const logoutUser = async (): Promise<void> => {
     console.error('Logout failed:', error);
     throw error;
   }
-}; 
+};
+
+export const fetchCurrentUser = async (): Promise<AuthResponse> => {
+  try {
+    const response = await axios.get(`${API_BASE_URL}/api/auth/profile`);
+    return response.data;
+  } catch (error) {
+    throw error;
+  }
+};
