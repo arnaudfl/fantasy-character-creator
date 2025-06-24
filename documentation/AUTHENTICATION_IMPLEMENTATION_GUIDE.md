@@ -3,11 +3,13 @@
 ## 🚀 Comprehensive Authentication Solution Implementation
 
 ### Overview
+
 This guide provides a detailed, step-by-step implementation of the authentication solution for the Fantasy Character Creator project, following the principles outlined in the Authentication Solution document.
 
 ## 📦 Project Setup and Initialization
 
 ### Step 1: Dependency Installation
+
 ```bash
 # Install core dependencies
 npm install express typescript prisma @prisma/client \
@@ -21,7 +23,8 @@ npm install -D @types/express @types/jsonwebtoken \
 ```
 
 ### Step 2: Project Structure
-```
+
+```bash
 src/
 ├── config/
 │   └── database.ts
@@ -43,7 +46,9 @@ src/
 ## 🗄️ Database Configuration
 
 ### Step 3: Prisma Schema Setup
+
 Create `prisma/schema.prisma`:
+
 ```typescript
 generator client {
   provider = "prisma-client-js"
@@ -94,6 +99,7 @@ model RefreshToken {
 ```
 
 ### Step 4: Database Migration
+
 ```bash
 # Initialize Prisma
 npx prisma init
@@ -108,7 +114,9 @@ npx prisma generate
 ## 🔒 Authentication Utilities
 
 ### Step 5: Password Utility Implementation
+
 Create `src/utils/passwordUtility.ts`:
+
 ```typescript
 import bcrypt from 'bcryptjs';
 
@@ -136,7 +144,9 @@ export class PasswordUtility {
 ```
 
 ### Step 6: Token Utility Implementation
+
 Create `src/utils/tokenUtility.ts`:
+
 ```typescript
 import jwt from 'jsonwebtoken';
 import { v4 as uuidv4 } from 'uuid';
@@ -176,7 +186,9 @@ export class TokenUtility {
 ```
 
 ### Step 7: Logging Utility Implementation
+
 Create `src/utils/logger.ts`:
+
 ```typescript
 import winston from 'winston';
 
@@ -199,7 +211,9 @@ export default logger;
 ## 🔐 Authentication Service
 
 ### Step 8: Authentication Service Implementation
+
 Create `src/services/authService.ts`:
+
 ```typescript
 import { PrismaClient, UserRole, AccountStatus } from '@prisma/client';
 import { PasswordUtility } from '../utils/passwordUtility';
@@ -392,7 +406,9 @@ export class AuthService {
 ## 🛡️ Authentication Middleware
 
 ### Step 9: Authentication Middleware Implementation
+
 Create `src/middleware/authMiddleware.ts`:
+
 ```typescript
 import { Request, Response, NextFunction } from 'express';
 import { TokenUtility } from '../utils/tokenUtility';
@@ -438,7 +454,9 @@ export class AuthMiddleware {
 ## 🌐 Authentication Routes
 
 ### Step 10: Authentication Routes Implementation
+
 Create `src/routes/authRoutes.ts`:
+
 ```typescript
 import express from 'express';
 import { AuthService } from '../services/authService';
@@ -509,7 +527,9 @@ export default router;
 ## 🚀 Server Configuration
 
 ### Step 11: Server Setup
+
 Create `src/server.ts`:
+
 ```typescript
 import express from 'express';
 import cors from 'cors';
@@ -561,6 +581,7 @@ export { app };
 ## 📝 Environment Configuration
 
 ### Step 12: Create .env File
+
 ```bash
 # Database Configuration
 DATABASE_URL="postgresql://username:password@localhost:5432/fantasy_db"
@@ -585,7 +606,9 @@ NODE_ENV=development
 ## 🐳 Docker Configuration
 
 ### Step 13: Docker Compose Setup
+
 Create `docker-compose.yml`:
+
 ```yaml
 version: '3.8'
 services:
@@ -647,7 +670,9 @@ volumes:
 ```
 
 ### Step 14: Dockerfile for Authentication Service
+
 Create `Dockerfile`:
+
 ```dockerfile
 # Use official Node.js runtime as base image
 FROM node:18-alpine
@@ -675,6 +700,7 @@ CMD ["npm", "start"]
 ```
 
 ### Step 15: Docker Management Commands
+
 ```bash
 # Build and start services
 docker-compose up --build -d
@@ -693,7 +719,9 @@ docker-compose down -v
 ```
 
 ### Step 16: Docker Environment Configuration
+
 Create `.env` file for Docker:
+
 ```bash
 # Database Configuration
 POSTGRES_USER=fantasy_user
@@ -714,6 +742,7 @@ DATABASE_URL=postgresql://${POSTGRES_USER}:${POSTGRES_PASSWORD}@localhost:5432/$
 ```
 
 ### Docker Security Best Practices
+
 - Use `.dockerignore` to exclude sensitive files
 - Never commit `.env` files to version control
 - Use multi-stage builds
@@ -722,6 +751,7 @@ DATABASE_URL=postgresql://${POSTGRES_USER}:${POSTGRES_PASSWORD}@localhost:5432/$
 - Scan images for vulnerabilities
 
 ### Continuous Integration Considerations
+
 - Integrate Docker builds in CI/CD pipeline
 - Automated vulnerability scanning
 - Performance and security testing
@@ -729,6 +759,7 @@ DATABASE_URL=postgresql://${POSTGRES_USER}:${POSTGRES_PASSWORD}@localhost:5432/$
 ## 🧪 Testing and Verification
 
 ### Step 17: Authentication Workflow Testing
+
 1. Register a new user
 2. Login with the registered credentials
 3. Retrieve user profile
@@ -736,6 +767,7 @@ DATABASE_URL=postgresql://${POSTGRES_USER}:${POSTGRES_PASSWORD}@localhost:5432/$
 5. Test role-based access control
 
 ## 🚀 Deployment Considerations
+
 - Use environment-specific configurations
 - Implement secure secret management
 - Set up continuous integration and deployment (CI/CD)

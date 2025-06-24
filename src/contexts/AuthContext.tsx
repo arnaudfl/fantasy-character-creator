@@ -1,5 +1,5 @@
-import React, { createContext, useContext, useState } from 'react';
-import { loginUser, registerUser, logoutUser } from '../services/authService';
+import React, { createContext, useContext, useState, useEffect } from 'react';
+import { loginUser, registerUser, logoutUser, fetchCurrentUser } from '../services/authService';
 
 interface User {
   id: string;
@@ -22,6 +22,21 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const [user, setUser] = useState<User | null>(null);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+
+  useEffect(() => {
+    const loadUser = async () => {
+      try {
+        setIsLoading(true);
+        const response = await fetchCurrentUser();
+        setUser(response.user);
+      } catch (err) {
+        setUser(null);
+      } finally {
+        setIsLoading(false);
+      }
+    };
+    loadUser();
+  }, []);
 
   const login = async (email: string, password: string) => {
     try {

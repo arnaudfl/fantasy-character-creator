@@ -19,12 +19,27 @@ export class AuthMiddleware {
   static authenticate = (req: AuthRequest, res: Response, next: NextFunction) => {
     try {
       const authHeader = req.headers.authorization;
+      let token: string | undefined;
 
-      if (!authHeader?.startsWith('Bearer ')) {
+      if (authHeader?.startsWith('Bearer ')) {
+        token = authHeader.split(' ')[1];
+      } else {
+        const cookieHeader = req.headers.cookie;
+        if (cookieHeader) {
+          const cookies = cookieHeader.split(';').map(c => c.trim());
+          for (const cookie of cookies) {
+            if (cookie.startsWith('accessToken=')) {
+              token = cookie.substring('accessToken='.length);
+              break;
+            }
+          }
+        }
+      }
+
+      if (!token) {
         return res.status(401).json({ message: 'No token provided' });
       }
 
-      const token = authHeader.split(' ')[1];
       const decoded = TokenUtility.verifyAccessToken(token);
       
       req.user = decoded;
